@@ -10,6 +10,20 @@
         {% if current_user.is_authenticated %}
             <h2>Hi, {{ current_user.nickname }}!</h2>
 
+            {% if current_user.email == None %}
+            <h3>I need your email address to send email alerts to you.
+                Please enter it with the below form.
+            {% else %}
+                <h2>Your registered email address is
+                    {{ current_user.email }}.
+                If you would like to change it, please use the form below.</h2>
+            {% endif %}
+            <form action="/email_entry" method="POST">
+                <input type="email" name="email" value="name@domain.com">Email
+                address </input>
+                <input type="submit" value="Submit!" />
+            </form></h3>
+
             <p><a href="{{ url_for('logout') }}">Logout</a></p>
         {% else %}
             <h2>I don't know you!</h2>

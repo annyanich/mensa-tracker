@@ -1,13 +1,15 @@
 # Based on this tutorial
 # http://blog.miguelgrinberg.com/post/oauth-authentication-with-flask
 #
-from flask import Flask, redirect, url_for, flash, render_template
+from flask import Flask, redirect, url_for, flash, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager, UserMixin, current_user, \
     login_user, logout_user
 from oauth_example_oauth import OAuthSignIn, FacebookSignIn
 
 app = Flask(__name__)
+
+# SECRET_KEY is just some random secret key that you need to make.  IDK why
 app.config['SECRET_KEY'] = 'V\x8cjc\xff\xb8\x02\x9f@JV\r\xd9K\xe9\xd5\xe0\xa1m\x9e\xd0 \x99*'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:\\temp\\mensa-scraper-oauth-test-db.sqlite'
 app.config['OAUTH_CREDENTIALS'] = {
@@ -74,6 +76,15 @@ def oauth_callback(provider):
     login_user(user, True)
     return redirect(url_for('index'))
 
+@app.route('/email_entry', methods=['POST'])
+def add_user_email():
+    if current_user.is_anonymous:
+        flash('You need to be logged in to do that.')
+        return redirect(url_for('index'))
+    email = request.form['email']
+    current_user.email = email
+    db.session.commit()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     db.create_all()
