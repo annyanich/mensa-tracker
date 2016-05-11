@@ -5,6 +5,10 @@ from flask import Flask, redirect, url_for, flash, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager, UserMixin, current_user, \
     login_user, logout_user
+
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
+
 from oauth_example_oauth import OAuthSignIn, FacebookSignIn
 
 app = Flask(__name__)
@@ -24,6 +28,11 @@ app.config['OAUTH_CREDENTIALS'] = {
 }
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
+
 lm = LoginManager(app)
 lm.login_view = 'index'
 
@@ -87,5 +96,6 @@ def add_user_email():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    db.create_all()
-    app.run(debug=True)
+    # db.create_all()
+    manager.run()
+    # app.run(debug=True)
