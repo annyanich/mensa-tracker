@@ -1,0 +1,142 @@
+/**
+* TorTags component for Joomla 1.6, Joomla 1.7, Joomla 2.5, Joomla 3.x
+* @package TorTags
+* @author Tormix Team
+* @Copyright Copyright (C) Tormix, www.tormix.com
+* @license GNU/GPL http://www.gnu.org/copyleft/gpl.html
+*/
+
+.tt_button {
+    border: 1px solid #C3C3C3;
+    border-radius: 10px 10px 10px 10px;
+    float: left;
+    margin-right: 3px;
+}
+
+.tt_button .tt_end {
+    margin-right: 2px;
+}
+
+.tt_notice, .tt_error {
+    background: none repeat scroll 0 0 #D14008;
+    color: #FDE910;
+    border-radius: 2px;
+    padding: 2px;
+}
+
+.tt_success {
+    background: none repeat scroll 0 0 green;
+    color: white;
+    border-radius: 2px;
+    padding: 2px;
+}
+
+.tt-tags {
+    padding: 2px;
+    clear: both;
+    overflow: hidden;
+}
+
+.tt_button {
+    margin-top: 3px;
+    margin-right: 5px;
+    margin-left: 2px;
+}
+
+.tt_notice_new {
+    padding-left: 20px;
+    background: url('../images/about.png') no-repeat;
+}
+
+.tt_inpval {
+    float: left;
+    padding: 1px;
+}
+
+.tt_button img {
+    margin: 3px 1px 1px 2px;
+}
+
+.tt_img {
+    width: 10px;
+    background: url('../images/tags.png') no-repeat scroll 1px 1px transparent;
+    float: left;
+}
+
+.tt_end a, .tt_end span {
+    padding: 0 3px;
+    text-decoration: none;
+    float: left;
+}
+
+/*GLOBAL*/
+.tt_button_add {
+    display: inline-block;
+    border: 1px solid #c3c3c3;
+    border-radius: 10px;
+    padding: 2px;
+}
+
+.tt_info_box {
+    float: right;
+    padding-left: 10px;
+    padding-right: 5px;
+}
+
+.tt_add_form_new {
+    color: #666666;
+    display: inline-block;
+    margin-top: 6px;
+}
+
+.tt_new_tags {
+    float: left;
+    padding: 2px;
+    font-weight: bold;
+}
+
+.tt_add_form {
+    display: inline-block;
+    border: 1px dashed #c3c3c3;
+    border-radius: 4px;
+    clear: both;
+    margin-top: 4px;
+}
+
+.tt_show_all_text {
+    float: right;
+}
+
+.tt_hidden_tags {
+    display: none;
+}
+
+.tt_show_tags {
+    display: block;
+}
+
+.tt_cats_pretext {
+    float: left;
+    padding-right: 3px;
+}
+
+.tt_cat {
+    background-image: url("../images/tt_cats.png");
+    background-repeat: no-repeat;
+    padding-left: 16px;
+}
+
+.tt-tags {
+    padding: 2px;
+    clear: both;
+    overflow: hidden;
+    font-size: 10px;
+}
+
+.tt_pretext {
+    float: left;
+    width: auto;
+    padding-top: 5px;
+}
+
+/**/

@@ -1,0 +1,232 @@
+/**
+ * style 4 - blue
+ --------------*/
+a,
+h1 a:hover,
+h2 a:hover,
+h3 a:hover {
+	color: #1085de;
+}
+
+#bottom-bar .container {
+	background-color: #1085de;
+}
+
+.module.color-title .module-title {
+	background: #1085de;
+}
+
+.module.style-color {
+	background:#1085de;
+	color: #fff;
+	padding: 20px;
+}
+
+.module.style-color  a {
+	color: #fff;
+}
+.module.style-color a:hover {
+	color: #000;
+}
+.module.style-color .module-title {
+	border: 0;
+}
+
+.module.style-color .module-title h3 {
+	color: #fff;
+	border: 0;
+}
+
+.module.border-color .module-title {
+	border-bottom: 3px solid #1085de;
+}
+
+.module.border-color-top .module-title {
+	border-top: 3px solid #1085de;
+	border-bottom: 0;
+}
+
+.nav .caret {
+border-top-color: #1085de;
+border-bottom-color: #1085de;
+}
+.nav a:hover .caret {
+border-top-color: #1085de;
+border-bottom-color: #1085de;
+}
+
+.portfolio-nav .joostrap.btn-group a.btn:hover,
+.portfolio-nav .joostrap.btn-group a.btn:focus,
+.portfolio-nav .joostrap.btn-group.open a.btn {
+	color: #1085de;
+}
+
+.portfolio-nav .joostrap.btn-group a:hover span.caret {
+	border-top: 4px solid #1085de;
+}
+
+.portfolio-nav .joostrap.btn-group.open a span.caret,
+.portfolio-nav .joostrap.btn-group.open a:focus span.caret {
+	border-top: 4px solid transparent;
+	border-bottom: 4px solid #1085de;
+}
+
+.joostrapmenu > li > a:hover,
+.joostrapmenu > li.active > a,
+.joostrapmenu > li.parent:hover > a,
+.joostrapmenu > li.active.parent > a,
+.joostrapmenu > li > span.separator:hover,
+.joostrapmenu > li.active > span.separator,
+.joostrapmenu > li.parent:hover > span.separator,
+.joostrapmenu > li.active.parent > span.separator  {
+	background: #1085de;
+	color:#fff;
+}
+
+.joostrapmenu ul li a:hover,
+.joostrapmenu ul li.active > a,
+.joostrapmenu ul li.parent:hover > a,
+.joostrapmenu ul li.active.parent > a ,
+.joostrapmenu ul li span.separator:hover,
+.joostrapmenu ul li.active > span.separator,
+.joostrapmenu ul li.parent:hover > span.separator,
+.joostrapmenu ul li.active.parent > span.separator {
+	color: #fff;
+	background-color: #1085de;
+	margin-right: 40px;
+}
+
+@media (max-width: 980px) {
+
+}
+
+.tags span a:hover {
+	background-color: #1085de;
+	color: #fff;
+}
+
+dl.tabs dt.tabs.open span h3 a,
+dl.tabs dt.tabs span h3 a:hover,
+.pane-sliders h3.title.pane-toggler-down a span {
+	color: #1085de;
+}
+
+.image-backdrop,
+.img-intro-btn:hover,
+p.img_caption {
+	background-color: #1085de;
+}
+
+.sequence .text-block h2 a:hover {
+	color: #1085de;
+}
+
+.sequence .text-block a.readmore:hover {
+	background-color: #1085de;
+}
+
+.sequence-pagination li span.active,
+.sequence-pagination li span:active {
+	border: 1px solid #1085de;
+	background-color: #1085de;
+}
+
+.sequence-pagination li span:hover {
+	border: 1px solid #1085de;
+}
+
+.joostrap-slider .sequence-preloader .preloading .circle {
+	fill: #1085de !important;
+}
+
+.joostrap-icons .front {
+	background-color: #1085de;
+}
+
+.joostrap-news {
+	background-color: #1085de;
+}
+
+.joostrap-news,
+.joostrap-news p {
+	color: #1085de;
+}
+
+.flex-control-paging li a.flex-active  {
+	border: 1px solid #1085de;
+}
+
+.nav-list > .active > a,
+.nav-list > .active > a:hover,
+.nav-list > .active > a:focus {
+	color: #ffffff;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+	background-color: #1085de;
+}
+
+.nav-pills > .active > a,
+.nav-pills > .active > a:hover,
+.nav-pills > .active > a:focus {
+	color: #ffffff;
+	background-color: #1085de;
+}
+
+.nav .dropdown-toggle .caret {
+	border-top-color: #1085de;
+	border-bottom-color: #1085de;
+	margin-top: 6px;
+}
+
+.nav .dropdown-toggle:hover .caret,
+.nav .dropdown-toggle:focus .caret {
+	border-top-color: #1085de;
+	border-bottom-color: #1085de;
+}
+
+.dropdown-menu > li > a.selected,
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus,
+.dropdown-submenu:hover > a,
+.dropdown-submenu:focus > a {
+	text-decoration: none;
+	color: #ffffff;
+	background: #1085de;
+}
+
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus {
+	color: #ffffff;
+	text-decoration: none;
+	outline: 0;
+	background: #1085de;
+}
+
+.btn-group.open .btn-primary.dropdown-toggle ,
+.btn-primary {
+	color: #ffffff;
+	background: #1085de;
+	border: 0;
+	*background-color: #1085de;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active,
+.btn-primary.disabled,
+.btn-primary[disabled] {
+	color: #ffffff;
+	background-image: none;
+	background-color: #000000;
+	*background-color: #000000;
+}
+.module.style-color .module-content,
+.module.style-color .module-title {
+	padding: 0 10px;
+}
+.module.style-color {
+	background-clip: content-box;
+	padding: 5px;
+}
