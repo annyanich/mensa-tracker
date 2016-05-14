@@ -9,10 +9,13 @@ from flask.ext.login import LoginManager, UserMixin, current_user, \
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
+import datetime
+
 from oauth_example_oauth import OAuthSignIn, FacebookSignIn
 
 app = Flask(__name__)
 
+app.config['DEBUG'] = None
 # SECRET_KEY is just some random secret key that you need to make.  IDK why
 app.config['SECRET_KEY'] = 'V\x8cjc\xff\xb8\x02\x9f@JV\r\xd9K\xe9\xd5\xe0\xa1m\x9e\xd0 \x99*'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:\\temp\\mensa-scraper-oauth-test-db.sqlite'
@@ -43,6 +46,21 @@ class User(UserMixin, db.Model):
     social_id = db.Column(db.String(64), nullable=False, unique=True)
     nickname = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(64), nullable=True)
+    searches = db.relationship("SavedSearch", backref="owner", lazy='dynamic')
+
+    def __repr__(self):
+        return '<User %r>' % self.nickname
+
+
+class SavedSearch(db.Model):
+    __tablename__ = 'searches'
+    id = db.Column(db.Integer, primary_key=True)
+    search_terms = db.Column(db.String(64), nullable=False)
+    timestamp = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def __repr__(self):
+        return '<SavedSearch %r>' % self.search_terms
 
 @lm.user_loader
 def load_user(id):
@@ -94,6 +112,45 @@ def add_user_email():
     current_user.email = email
     db.session.commit()
     return redirect(url_for('index'))
+
+
+@app.route('/add_search', methods=['POST'])
+def add_search():
+    if current_user.is_anonymous:
+        flash('You need to be logged in to do that.')
+        return redirect(url_for('index'))
+
+    search_terms = request.form['search_terms']
+    if not search_terms:
+        flash("You can't save a search with blank search terms.")
+        return redirect(url_for('index'))
+
+    search = SavedSearch(owner=current_user,
+                         search_terms=search_terms,
+                         timestamp=datetime.datetime.utcnow())
+    db.session.add(search)
+    db.session.commit()
+    flash('Search saved.')
+    return redirect(url_for('index'))
+
+
+@app.route('/savedsearches/<int:search_id>/delete', methods=['POST'])
+def delete_search(search_id):
+    if current_user.is_anonymous:
+        flash('You need to be logged in to do that.')
+        return redirect(url_for('index'))
+
+    search = SavedSearch.query.filter_by(id=search_id).first()
+    if (not search) or (search.owner != current_user):
+        flash('Invalid search id.  Either the given search id does not exist, '
+              'or it does not belong to you.')
+        return redirect(url_for('index'))
+
+    db.session.delete(search)
+    db.session.commit()
+    flash('Deleted search: %r' % search.search_terms)
+    return redirect(url_for('index'))
+
 
 if __name__ == '__main__':
     # db.create_all()
