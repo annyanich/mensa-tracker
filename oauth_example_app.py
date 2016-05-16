@@ -11,6 +11,8 @@ from flask_migrate import Migrate, MigrateCommand
 
 import datetime
 
+import os
+
 from oauth_example_oauth import OAuthSignIn, FacebookSignIn
 
 app = Flask(__name__)
@@ -18,7 +20,10 @@ app = Flask(__name__)
 app.config['DEBUG'] = None
 # SECRET_KEY is just some random secret key that you need to make.  IDK why
 app.config['SECRET_KEY'] = 'V\x8cjc\xff\xb8\x02\x9f@JV\r\xd9K\xe9\xd5\xe0\xa1m\x9e\xd0 \x99*'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:\\temp\\mensa-scraper-oauth-test-db.sqlite'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(
+    os.path.dirname(os.path.realpath(__file__)),
+    'mensa-scraper-oauth-test-db.sqlite'
+)
 app.config['OAUTH_CREDENTIALS'] = {
     'facebook': {
         'id': '215569478828174',
