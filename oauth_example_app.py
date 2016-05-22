@@ -35,6 +35,10 @@ app.config['OAUTH_CREDENTIALS'] = {
     # }
 }
 
+# Expose datetime-formatting functions to all templates
+from momentjs import Momentjs
+app.jinja_env.globals['Momentjs'] = Momentjs
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
