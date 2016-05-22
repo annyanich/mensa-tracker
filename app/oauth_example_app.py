@@ -13,7 +13,7 @@ import datetime
 
 import os
 
-from oauth_example_oauth import OAuthSignIn, FacebookSignIn
+from oauth import OAuthSignIn, FacebookSignIn
 
 app = Flask(__name__)
 
