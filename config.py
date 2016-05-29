@@ -5,13 +5,16 @@
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db.sqlite')
-
 DEBUG = None
-# SECRET_KEY is just some random secret key that you need to make.  IDK why
-SECRET_KEY =  'V\x8cjc\xff\xb8\x02\x9f@JV\r\xd9K\xe9\xd5\xe0\xa1m\x9e\xd0 \x99*'
 
+# SECRET_KEY is a cryptographic secret used by Flask.
+# You should generate a new one before deploying this app, or attackers will
+# find this key on Github and do bad stuff to you.
+SECRET_KEY = 'V\x8cjc\xff\xb8\x02\x9f@JV\r\xd9K\xe9\xd5\xe0\xa1m\x9e\xd0 \x99*'
+
+# More deployment-specific app IDs/secrets.
+# Login via Twitter is not yet implemented.
 OAUTH_CREDENTIALS = {
     'facebook': {
         'id': '215569478828174',
