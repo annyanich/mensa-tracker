@@ -6,28 +6,19 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager, UserMixin, current_user, \
     login_user, logout_user
 
-from flask_script import Manager
-from flask_migrate import Migrate, MigrateCommand
-
 import datetime
 
-import os
-
-from oauth import OAuthSignIn, FacebookSignIn
+from app.oauth import OAuthSignIn, FacebookSignIn
 
 app = Flask(__name__)
 
 app.config.from_object('config')
 
 # Expose datetime-formatting functions to all templates
-from momentjs import Momentjs
+from app.momentjs import Momentjs
 app.jinja_env.globals['Momentjs'] = Momentjs
 
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
-manager = Manager(app)
-manager.add_command('db', MigrateCommand)
 
 lm = LoginManager(app)
 lm.login_view = 'index'
@@ -144,8 +135,3 @@ def delete_search(search_id):
     flash('Deleted search: %r' % search.search_terms)
     return redirect(url_for('index'))
 
-
-if __name__ == '__main__':
-    # db.create_all()
-    manager.run()
-    # app.run(debug=True)
