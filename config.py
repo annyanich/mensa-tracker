@@ -7,7 +7,6 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db.sqlite')
-SQLALCHEMY_DB_REPO = os.path.join(basedir, 'db_repository')
 
 DEBUG = None
 # SECRET_KEY is just some random secret key that you need to make.  IDK why
