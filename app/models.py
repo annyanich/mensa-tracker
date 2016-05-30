@@ -23,3 +23,19 @@ class SavedSearch(db.Model):
 
     def __repr__(self):
         return '<SavedSearch %r>' % self.search_terms
+
+
+class MenuEntry(db.Model):
+    __tablename__ = 'menu_entries'
+    id = db.Column(db.Integer, primary_key=True)
+    time_scraped = db.Column(db.DateTime, nullable=False)
+    date_valid = db.Column(db.Date, nullable=False)
+    mensa = db.Column(db.String(64), nullable=False)
+    category = db.Column(db.String(64), nullable=False)
+    description = db.Column(db.String(500), nullable=False)
+
+    def __repr__(self):
+        return '<MenuEntry scraped: {0} valid: {1} Mensa: {2} Category: {3} ' \
+               'Description: {4}'.format(self.time_scraped, self.date_valid,
+                                         self.mensa,
+                                         self.category, self.description)
