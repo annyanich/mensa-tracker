@@ -1,5 +1,6 @@
 from app import db
 from flask.ext.login import UserMixin
+from sqlalchemy import UniqueConstraint
 
 
 class User(UserMixin, db.Model):
@@ -33,6 +34,10 @@ class MenuEntry(db.Model):
     mensa = db.Column(db.String(64), nullable=False)
     category = db.Column(db.String(64), nullable=False)
     description = db.Column(db.String(500), nullable=False)
+    __table_args__ = (UniqueConstraint('date_valid', 'mensa', 'category',
+                                       'description',
+                                       name="unique_menu_entry_date_mensa_category_description"),
+                      )
 
     def __repr__(self):
         return '<MenuEntry scraped: {0} valid: {1} Mensa: {2} Category: {3} ' \
