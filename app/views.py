@@ -1,5 +1,5 @@
 from app import app, db, lm
-from app.models import User, SavedSearch
+from app.models import User, SavedSearch, MenuEntry
 from app.oauth import OAuthSignIn, FacebookSignIn
 
 from flask import redirect, url_for, flash, render_template, request
@@ -16,6 +16,12 @@ def load_user(user_id):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/mensahistory')
+def mensa_history():
+    menu_entries = MenuEntry.query.order_by(MenuEntry.date_valid)
+    return render_template('mensahistory.html', menu_entries=menu_entries)
 
 
 @app.route('/logout')
