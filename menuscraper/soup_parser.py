@@ -122,7 +122,14 @@ def parse_table(menu_table):
     # Skip the first row of data, because it's just the days of the week.
     for row in data[1:]:
 
-        # Separate the category's name from the category's price..
+        # Each row is expected to have six items in the following order :
+        # [Category name & price] [monday] [tuesday] [wednesday] [thursday] [friday]
+        if len(row) is not 6:
+            raise TableParsingError("A row of the menu is not exactly six items long."
+                                    "Row: {row}"
+                                    "(Expected format: [Category] [Monday] ... [Friday])"
+                                    .format(row=row))
+
         category_string = row[0]
         category_name = re.sub('[^a-zA-Z]', '', category_string)
         category_price = price_from_category(category_string)
