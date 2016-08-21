@@ -9,14 +9,14 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'menuscraper'
+BOT_NAME = 'Mensa Menu Scraper'
 
 SPIDER_MODULES = ['menuscraper.spiders']
 NEWSPIDER_MODULE = 'menuscraper.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'menuscraper (+http://www.yourdomain.com)'
+USER_AGENT = 'MensaScraper Alpha (ann.yanich@gmail.com)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
