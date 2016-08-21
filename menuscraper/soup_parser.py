@@ -21,9 +21,8 @@ class DateRangeParsingError(ValueError):
 def get_date_range_from_string(date_range_string):
     """Parse the 5 day long date range that is usually posted above a menu.
     :param date_range_string: E.g. "(31.01.16 - 04.02.16)"
-    :return A list of five datetime objects representing the dates the menu
+    :return A list of five datetime.date objects representing the dates the menu
     is valid for.
-    TODO Possibly switch to using datetime.date objects
     """
 
     # The dates are formatted "(dd.mm.yy - dd.mm.yy)".
@@ -37,8 +36,8 @@ def get_date_range_from_string(date_range_string):
                     date_range_string,
                     regex.pattern))
 
-    # Convert from strings into datetime.datetime values
-    dates = [datetime.datetime.strptime(string, "%d.%m.%y")
+    # Convert from strings into datetime.date values
+    dates = [datetime.datetime.strptime(string, "%d.%m.%y").date()
              for string in date_strings]
     start_date, end_date = dates[0], dates[1]
 
