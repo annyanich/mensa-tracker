@@ -64,8 +64,10 @@ CONCURRENT_REQUESTS = 1
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
+# Items go through from lower valued to higher valued classes.
 ITEM_PIPELINES = {
-   'menuscraper.pipelines.DatabasePipeline': 300,
+   'menuscraper.pipelines.FilterDuplicates': 100,
+   'menuscraper.pipelines.SaveToDatabase': 200
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
