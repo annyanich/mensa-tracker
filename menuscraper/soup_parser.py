@@ -103,9 +103,9 @@ def parse_table(menu_table):
     # the names of the dishes offered on the five days of the week.
     data = []
     table_body = menu_table.find('tbody')
-    rows = table_body.find_all('tr')
+    rows = table_body.find_all('tr', recursive=False)
     for row in rows:
-        cols = row.find_all('td')
+        cols = row.find_all('td', recursive=False)
         cols = [ele.text.strip() for ele in cols]
         data.append(cols)
 
