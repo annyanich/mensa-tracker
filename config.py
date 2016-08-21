@@ -6,6 +6,11 @@ import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db.sqlite')
+
+# Explicitly disable Flask-SQLAlchemy's event notification system.  It defaults to False,
+# but Flask will throw a warning unless we explicitly set it to False ourselves.
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 DEBUG = None
 
 # SECRET_KEY is a cryptographic secret used by Flask.
