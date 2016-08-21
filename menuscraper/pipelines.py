@@ -7,7 +7,6 @@
 
 from app import db
 from app.models import MenuEntry as DBMenuEntry
-import datetime
 from scrapy.exceptions import DropItem
 
 
@@ -42,6 +41,6 @@ class SaveToDatabase:
                     description=item['description'],
                     date_valid=item['date_valid'],
                     category=item['category'],
-                    time_scraped=datetime.datetime.utcnow())
+                    time_scraped=spider.crawler.stats.get_stats(spider)['start_time'])
         db.session.add(new_entry)
         db.session.commit()
