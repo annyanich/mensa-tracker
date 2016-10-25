@@ -30,3 +30,6 @@ OAUTH_CREDENTIALS = {
     #     'secret': 'm9TEd58DSEtRrZHpz2EjrV9AhsBRxKMo8m3kuIZj3zLwzwIimt'
     # }
 }
+
+GMAIL_USERNAME = 'yourusername@gmail.com'
+GMAIL_PASSWORD = 'yourpassword'
