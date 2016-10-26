@@ -17,19 +17,3 @@ DEBUG = None
 # You should generate a new one before deploying this app, or attackers will
 # find this key on Github and do bad stuff to you.
 SECRET_KEY = 'V\x8cjc\xff\xb8\x02\x9f@JV\r\xd9K\xe9\xd5\xe0\xa1m\x9e\xd0 \x99*'
-
-# More deployment-specific app IDs/secrets.
-# Login via Twitter is not yet implemented.
-OAUTH_CREDENTIALS = {
-    'facebook': {
-        'id': '215569478828174',
-        'secret': '4ed42c146ac79988bb7073dd77514a45'
-    },
-    # 'twitter': {
-    #     'id': '3RzWQclolxWZIMq5LJqzRZPTl',
-    #     'secret': 'm9TEd58DSEtRrZHpz2EjrV9AhsBRxKMo8m3kuIZj3zLwzwIimt'
-    # }
-}
-
-GMAIL_USERNAME = 'yourusername@gmail.com'
-GMAIL_PASSWORD = 'yourpassword'

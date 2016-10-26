@@ -40,13 +40,6 @@
 
         <!--Non-collapsable navbar elements-->
         <div class="navbar-header pull-right">
-          <ul class="nav navbar-nav pull-left">
-            {% if current_user.is_authenticated %}
-            <li><a href="{{ url_for('logout') }}">Logout </a></li>
-            {% else %}
-            <li><a href="{{ url_for('oauth_authorize', provider='facebook') }}">Login with Facebook</a></li>
-            {% endif %}
-          </ul>
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
@@ -60,8 +53,6 @@
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
             <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li><a href="#"> {{ current_user.nickname }}</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -70,21 +61,15 @@
     <div class="container">
 
       <div class="starter-template">
-        <h1>Uni Oldenburg Mensa Tracker</h1>
-        <p class="lead">Use this website to be alerted whenever dishes
-          containing certain key words appear on your university's Mensa menu.
+        <h1>(Unoffizieller) Mensa-Tracker</h1>
+        <p class="lead">Diese Webseite stellt historische Daten von den Mensa-Speiseplänen der Uni Oldenburg dar, die man auf der Webseite der Studentenwerk finden kann.
+          Sie ist 100% nicht-offiziell.  Ich arbeite weder bei der Uni noch bei der Studentenwerk. Ich bin nur Studentin.  Dies ist ein Nebenprojekt, das ich gemacht habe, um meine Programmierkenntnisse zu verbessern.
           </p>
       </div>
 
     </div><!-- /.container -->
 
     <div class="container-fluid">
-      {% for message in get_flashed_messages() %}
-        <p><b>Alert</b>: {{ message }}</p>
-      {% endfor %}
-
-      {% if current_user.is_authenticated %}
-        <h2>Hi, {{ current_user.nickname }}!  Here you can view historical mensa data.</h2>
 
         <div class="input-group"> <span class="input-group-addon">Filter</span>
             <input id="filter" type="text" class="form-control" placeholder="Date, category, or keywords.  e.g. Dessert, Kartoffel, ">
@@ -110,11 +95,6 @@
 
       <br/>
       <br/>
-      {% else %}
-          <h2>I don't know you!</h2>
-          <p><a href="{{ url_for('oauth_authorize', provider='facebook') }}">Login with Facebook</a></p>
-          <p><a href="{{ url_for('oauth_authorize', provider='twitter') }}">Login with Twitter</a></p>
-      {% endif %}
     </div>
 
     <!-- Bootstrap core JavaScript
