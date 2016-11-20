@@ -27,3 +27,20 @@ if os.environ.get('SECRET_KEY') is None:
                      'See http://flask.pocoo.org/docs/0.11/quickstart/ for an example of how to generate one.')
 else:
     SECRET_KEY = os.environ['SECRET_KEY']
+
+OAUTH_CREDENTIALS = {'facebook': {}}
+
+if os.environ.get('FACEBOOK_APP_ID') is None:
+    raise ValueError('The environment variable "FACEBOOK_APP_ID" is missing.'
+                     'Please specify it to allow users to login with Facebook.'
+                     'You can get this from developers.facebook.com after creating an app there.')
+else:
+    OAUTH_CREDENTIALS['facebook']['id'] = os.environ['FACEBOOK_APP_ID']
+
+if os.environ.get('FACEBOOK_APP_SECRET') is None:
+    raise ValueError('The environment variable "FACEBOOK_APP_SECRET" is missing.'
+                     'Please specify it to allow users to login with Facebook.'
+                     'You can get this from developers.facebook.com after creating an app there.')
+else:
+    OAUTH_CREDENTIALS['facebook']['secret'] = os.environ['FACEBOOK_APP_SECRET']
+
