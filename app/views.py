@@ -44,6 +44,20 @@ def oauth_authorize():
     return oauth.authorize()
 
 
+@app.route('/reauthorize/facebook')
+def oauth_reauthorize():
+    """
+    Accessible via a link when the user has failed to grant us permission to access their email address.
+    Sends them to Facebook's OAuth permissions dialog.
+    If they already have given us permission, then this just bounces them back to the main page.
+    """
+    if current_user.is_anonymous:
+        flash('You need to be logged in to do that.')
+        return redirect(url_for('index'))
+    oauth = OAuthSignIn.get_provider('facebook')
+    return oauth.reauthorize()
+
+
 @app.route('/callback/facebook')
 def oauth_callback():
     if not current_user.is_anonymous:

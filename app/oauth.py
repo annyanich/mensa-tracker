@@ -18,6 +18,11 @@ class OAuthSignIn(object):
         authenticate there"""
         pass
 
+    def reauthorize(self):
+        """Redirects to the provider's website to let the user grant us permissions,
+        like giving us access to their email address."""
+        pass
+
     def callback(self):
         """Handles the callback when the provider redirects back to our app
         post-authentication.
@@ -66,6 +71,14 @@ class FacebookSignIn(OAuthSignIn):
             scope='email',  # Ask Facebook for user's email address
             response_type='code',  # Indicates we are a web app
             redirect_uri=self.get_callback_url()
+        ))
+
+    def reauthorize(self):
+        return redirect(self.service.get_authorize_url(
+            scope='email',
+            response_type='code',
+            redirect_uri=self.get_callback_url(),
+            auth_type='rerequest'
         ))
 
     def callback(self):
