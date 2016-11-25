@@ -77,10 +77,7 @@ class FacebookSignIn(OAuthSignIn):
                   'redirect_uri': self.get_callback_url()}
         )
 
-        # Not sure why Facebook isn't giving me the user's email.
-        # TODO figure this out.
-        me = oauth_session.get('me', params={'scope': 'user:email'}).json()
-        # email = oauth_session.get('email').json()
+        me = oauth_session.get('me', params={'fields': 'email,name'}).json()
         email = me.get('email')
         return (
             'facebook$' + me['id'],  # Social ID
