@@ -67,15 +67,6 @@ def add_user_email():
     db.session.commit()
     return redirect(url_for('index'))
 
-@app.route('/email_authorize')
-def grant_email_permission():
-    if current_user.is_anonymous:
-        flash('You need to be logged in to do that.')
-        return redirect(url_for('index'))
-
-
-
-
 
 @app.route('/add_search', methods=['POST'])
 def add_search():
