@@ -26,28 +26,35 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-
-@app.route('/authorize/<provider>')
-def oauth_authorize(provider):
-    """Invoked when the user clicks the "login with..." button.
-    :param provider: The name of the provider, e.g. 'facebook' or 'twitter'"""
+# @app.route('/authorize/<provider>')
+@app.route('/authorize/facebook')
+def oauth_authorize():
+    """Invoked when the user clicks the "login with..." button."""
     if not current_user.is_anonymous:
         return redirect(url_for('index'))
-    oauth = OAuthSignIn.get_provider(provider)
+    oauth = OAuthSignIn.get_provider('facebook')
+    # Intentionally left out support for multiple OAuth providers
+    # try:
+    #     oauth = OAuthSignIn.get_provider(provider)
+    # except KeyError:
+    #     flash('Invalid oauth provider')
+    #     return redirect(url_for('index'))
     assert(isinstance(oauth, FacebookSignIn))
 
     return oauth.authorize()
 
 
-@app.route('/callback/<provider>')
-def oauth_callback(provider):
+@app.route('/callback/facebook')
+def oauth_callback():
     if not current_user.is_anonymous:
         return redirect(url_for('index'))
-    oauth = OAuthSignIn.get_provider(provider)
+
+    oauth = OAuthSignIn.get_provider('facebook')
     social_id, username, email = oauth.callback()
     if social_id is None:
         flash('Authentication failed.')
         return redirect(url_for('index'))
+
     user = User.query.filter_by(social_id=social_id).first()
     if not user:
         user = User(social_id=social_id, nickname=username, email=email)
