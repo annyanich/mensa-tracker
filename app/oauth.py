@@ -1,5 +1,7 @@
 from rauth import OAuth1Service, OAuth2Service
 from flask import current_app, url_for, request, redirect, session
+import requests
+import json
 
 
 class OAuthSignIn(object):
@@ -27,6 +29,12 @@ class OAuthSignIn(object):
         """Handles the callback when the provider redirects back to our app
         post-authentication.
         :return A three-tuple: Social ID, Nickname, Email address"""
+        pass
+
+    def revoke_email_permission(self, user_id):
+        """Tells the OAuth provider that we no longer want access to the users's
+        email address.
+        :return True if successful, False otherwise"""
         pass
 
     def get_callback_url(self):
@@ -98,6 +106,16 @@ class FacebookSignIn(OAuthSignIn):
             email  # Email address
         )
 
+    def revoke_email_permission(self, user_id):
+        permission_url = 'https://graph.facebook.com/v2.8/{user_id}/permissions/email'.format(
+            user_id=user_id
+        )
+        outcome = requests.delete(permission_url,
+                     params={'access_token': '{0}|{1}'.format(self.consumer_id, self.consumer_secret)})
+        outcome_json = json.loads(outcome.text)
+
+        answer = outcome_json.get('success') is True
+        return answer
 
 
 

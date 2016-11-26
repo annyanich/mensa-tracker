@@ -6,6 +6,7 @@ from flask import redirect, url_for, flash, render_template, request
 from flask.ext.login import current_user, login_user, logout_user
 
 import datetime
+import re
 
 
 @lm.user_loader
@@ -115,3 +116,24 @@ def delete_search(search_id):
     flash('Deleted search: %r' % search.search_terms)
     return redirect(url_for('index'))
 
+
+@app.route('/delete_email_address')
+def delete_email_address():
+
+    if current_user.is_anonymous:
+        flash('You need to be logged in to do that')
+        return redirect(url_for('index'))
+
+    current_user.email = None
+    db.session.commit()
+
+    oauth = OAuthSignIn.get_provider('facebook')
+    user_id = re.findall('\d+', current_user.social_id)[0]  # Strip out the 'facebook$' at the start of the id
+    permission_revoked = oauth.revoke_email_permission(user_id)
+
+    if not permission_revoked:
+        flash('There was a problem giving up the permission to access your email address.  '
+              'It may be re-added to your account here the next time you sign in.  '
+              'To permanently remove it, please use your privacy settings in Facebook.')
+
+    return redirect(url_for('index'))

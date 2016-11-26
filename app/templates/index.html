@@ -100,7 +100,8 @@
             <p>I need your email address to send email alerts to you.
             </p><br>
           {% else %}
-            <p>Your registered email address is {{ current_user.email }}.
+            <p>Your registered email address is {{ current_user.email }}.<br>
+            To remove your email address, click <a href="{{ url_for('delete_email_address') }}">here.</a></p><br>
           {% endif %}
         </div>
         <div class="col-lg-8">
