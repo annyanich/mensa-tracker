@@ -98,16 +98,10 @@
           <br>
           {% if current_user.email == None %}
             <p>I need your email address to send email alerts to you.
-                Please enter it with the below form.</p><br>
+            </p><br>
           {% else %}
             <p>Your registered email address is {{ current_user.email }}.
-            If you would like to change it, please use the form below.</p><br>
           {% endif %}
-          <form action="/email_entry" method="POST">
-              <input type="email" name="email"
-                     placeholder="name@domain.com"/>
-              <input type="submit" value="Submit!" />
-          </form>
         </div>
         <div class="col-lg-8">
          {% if current_user.searches.all() %}

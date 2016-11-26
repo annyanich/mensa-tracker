@@ -78,17 +78,6 @@ def oauth_callback():
     return redirect(url_for('index'))
 
 
-@app.route('/email_entry', methods=['POST'])
-def add_user_email():
-    if current_user.is_anonymous:
-        flash('You need to be logged in to do that.')
-        return redirect(url_for('index'))
-    email = request.form['email']
-    current_user.email = email
-    db.session.commit()
-    return redirect(url_for('index'))
-
-
 @app.route('/add_search', methods=['POST'])
 def add_search():
     if current_user.is_anonymous:
