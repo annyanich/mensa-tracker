@@ -101,6 +101,8 @@
             </p><br>
           {% else %}
             <p>Your registered email address is {{ current_user.email }}.<br>
+            To change it, please change your primary email address on Facebook,
+              then <a href="{{ url_for('logout') }}">log out</a> of here and log back in again.<br>
             To remove your email address, click <a href="{{ url_for('delete_email_address') }}">here.</a></p><br>
           {% endif %}
         </div>

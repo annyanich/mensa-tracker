@@ -75,6 +75,15 @@ def oauth_callback():
         user = User(social_id=social_id, nickname=username, email=email)
         db.session.add(user)
         db.session.commit()
+    else:  # Update email and nickname to those provided by Facebook.
+        # This way, email name changes are reflected in our interface upon login..
+        if email and email != user.email:
+            user.email = email
+            db.session.commit()
+        if username and username != user.nickname:
+            user.nickname = username
+            db.session.commit()
+
     login_user(user, True)
     return redirect(url_for('index'))
 
