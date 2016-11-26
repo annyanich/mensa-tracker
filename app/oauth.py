@@ -20,14 +20,20 @@ class OAuthSignIn(object):
         authenticate there"""
         pass
 
-    def reauthorize(self):
+    def rerequest_permissions(self):
         """Redirects to the provider's website to let the user grant us permissions,
         like giving us access to their email address."""
         pass
 
-    def callback(self):
+    def callback_authorize(self):
         """Handles the callback when the provider redirects back to our app
         post-authentication.
+        :return A four-tuple: Social ID, Nickname, Email address, Permissions granted"""
+        pass
+
+    def callback_rerequest_permissions(self):
+        """Handles the callback when the provider redirects back to our app
+        after asking the user to grant us permissions that they have previously denied us.
         :return A four-tuple: Social ID, Nickname, Email address, Permissions granted"""
         pass
 
@@ -37,8 +43,12 @@ class OAuthSignIn(object):
         :return True if successful, False otherwise"""
         pass
 
-    def get_callback_url(self):
-        return url_for('oauth_callback', provider=self.provider_name,
+    def get_callback_url_for_authorize(self):
+        return url_for('oauth_callback_authorize', provider=self.provider_name,
+                       _external=True)
+
+    def get_callback_url_for_rerequest_permissions(self):
+        return url_for('oauth_callback_rerequest_permissions', provider=self.provider_name,
                        _external=True)
 
     @classmethod
@@ -78,24 +88,30 @@ class FacebookSignIn(OAuthSignIn):
         return redirect(self.service.get_authorize_url(
             scope='email',  # Ask Facebook for user's email address
             response_type='code',  # Indicates we are a web app
-            redirect_uri=self.get_callback_url()
+            redirect_uri=self.get_callback_url_for_authorize()
         ))
 
-    def reauthorize(self):
+    def rerequest_permissions(self):
         return redirect(self.service.get_authorize_url(
             scope='email',
             response_type='code',
-            redirect_uri=self.get_callback_url(),
+            redirect_uri=self.get_callback_url_for_rerequest_permissions(),
             auth_type='rerequest'
         ))
 
-    def callback(self):
+    def callback_authorize(self):
+        return self.callback(self.get_callback_url_for_authorize())
+
+    def callback_rerequest_permissions(self):
+        return self.callback(self.get_callback_url_for_rerequest_permissions())
+
+    def callback(self, callback_url):
         if 'code' not in request.args:
             return None, None, None, None
         oauth_session = self.service.get_auth_session(
             data={'code': request.args['code'],
                   'grant_type': 'authorization_code',
-                  'redirect_uri': self.get_callback_url()}
+                  'redirect_uri': callback_url}
         )
 
         me = oauth_session.get('me', params={'fields': 'email,name'}).json()

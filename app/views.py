@@ -45,8 +45,8 @@ def oauth_authorize():
     return oauth.authorize()
 
 
-@app.route('/reauthorize/facebook')
-def oauth_reauthorize():
+@app.route('/rerequest_permissions/facebook')
+def oauth_rerequest_permissions():
     """
     Accessible via a link when the user has failed to grant us permission to access their email address.
     Sends them to Facebook's OAuth permissions dialog.
@@ -56,16 +56,16 @@ def oauth_reauthorize():
         flash('You need to be logged in to do that.')
         return redirect(url_for('index'))
     oauth = OAuthSignIn.get_provider('facebook')
-    return oauth.reauthorize()
+    return oauth.rerequest_permissions()
 
 
-@app.route('/callback/facebook')
-def oauth_callback():
+@app.route('/callback/login/facebook')
+def oauth_callback_authorize():
     if not current_user.is_anonymous:
         return redirect(url_for('index'))
 
     oauth = OAuthSignIn.get_provider('facebook')
-    social_id, username, email, is_email_granted = oauth.callback()
+    social_id, username, email, is_email_granted = oauth.callback_authorize()
     if social_id is None:
         flash('Authentication failed.')
         return redirect(url_for('index'))
@@ -74,7 +74,7 @@ def oauth_callback():
         flash(Markup(
             'To send you email alerts, we need access to your email address.'
             'To give us permission via Facebook, click <a href={0}>here.</a>'.format(
-                url_for('oauth_reauthorize'))
+                url_for('oauth_rerequest_permissions'))
         ))
 
     user = User.query.filter_by(social_id=social_id).first()
@@ -93,6 +93,32 @@ def oauth_callback():
 
     login_user(user, True)
     return redirect(url_for('index'))
+
+
+@app.route('/callback/rerequest_permissions/facebook')
+def oauth_callback_rerequest_permissions():
+    if current_user.is_anonymous:
+        flash('You need to be logged in to do that')
+        return redirect(url_for('index'))
+
+    oauth = OAuthSignIn.get_provider('facebook')
+    social_id, username, email, is_email_granted = oauth.callback_rerequest_permissions()
+
+    if not is_email_granted:
+        flash("It looks like you didn't give us permission to see your email address." \
+              "Please send a bug report (ann.yanich@gmail.com) if you actually did grant "
+              "us permission, but still see this message.")
+        return redirect(url_for('index'))
+
+    if email and email != current_user.email:
+        current_user.email = email
+        db.session.commit()
+    if username and username != current_user.nickname:
+        current_user.nickname = username
+        db.session.commit()
+
+    flash('Please log back in for the changes to take effect.')
+    return redirect(url_for('logout'))
 
 
 @app.route('/add_search', methods=['POST'])
