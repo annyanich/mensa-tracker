@@ -2,7 +2,7 @@ from app import app, db, lm
 from app.models import User, SavedSearch, MenuEntry
 from app.oauth import OAuthSignIn, FacebookSignIn
 
-from flask import redirect, url_for, flash, render_template, request
+from flask import redirect, url_for, flash, render_template, request, Markup
 from flask.ext.login import current_user, login_user, logout_user
 
 import datetime
@@ -65,10 +65,17 @@ def oauth_callback():
         return redirect(url_for('index'))
 
     oauth = OAuthSignIn.get_provider('facebook')
-    social_id, username, email = oauth.callback()
+    social_id, username, email, is_email_granted = oauth.callback()
     if social_id is None:
         flash('Authentication failed.')
         return redirect(url_for('index'))
+
+    if not is_email_granted:
+        flash(Markup(
+            'To send you email alerts, we need access to your email address.'
+            'To give us permission via Facebook, click <a href={0}>here.</a>'.format(
+                url_for('oauth_reauthorize'))
+        ))
 
     user = User.query.filter_by(social_id=social_id).first()
     if not user:

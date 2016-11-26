@@ -28,7 +28,7 @@ class OAuthSignIn(object):
     def callback(self):
         """Handles the callback when the provider redirects back to our app
         post-authentication.
-        :return A three-tuple: Social ID, Nickname, Email address"""
+        :return A four-tuple: Social ID, Nickname, Email address, Permissions granted"""
         pass
 
     def revoke_email_permission(self, user_id):
@@ -91,7 +91,7 @@ class FacebookSignIn(OAuthSignIn):
 
     def callback(self):
         if 'code' not in request.args:
-            return None, None, None
+            return None, None, None, None
         oauth_session = self.service.get_auth_session(
             data={'code': request.args['code'],
                   'grant_type': 'authorization_code',
@@ -100,10 +100,16 @@ class FacebookSignIn(OAuthSignIn):
 
         me = oauth_session.get('me', params={'fields': 'email,name'}).json()
         email = me.get('email')
+        permissions_json = oauth_session.get('/me/permissions').json()
+
+        is_email_granted = permissions_json.get('data') and \
+            {'status': 'granted', 'permission': 'email'} in permissions_json.get('data')
+
         return (
             'facebook$' + me['id'],  # Social ID
             me['name'],  # Nickname = user's real name
-            email  # Email address
+            email,  # Email address
+            is_email_granted
         )
 
     def revoke_email_permission(self, user_id):
