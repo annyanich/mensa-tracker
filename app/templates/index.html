@@ -97,8 +97,10 @@
           </form>
           <br>
           {% if current_user.email == None %}
-            <p>I need your email address to send email alerts to you.
-            </p><br>
+            <p>We use your email address to send email alerts to you when items appear on the menu
+              which match your search criteria.  If you would like to receive alerts, please
+              give us permission to see your email address via the link below.</p><br>
+            <a href="{{ url_for('oauth_rerequest_permissions') }}">Grant email access via Facebook</a>
           {% else %}
             <p>Your registered email address is {{ current_user.email }}.<br>
             To change it, please change your primary email address on Facebook,
