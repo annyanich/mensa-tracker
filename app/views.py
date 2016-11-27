@@ -110,8 +110,8 @@ def oauth_callback_rerequest_permissions():
         current_user.nickname = username
         db.session.commit()
 
-    flash('Please log back in for the changes to take effect.')
-    return redirect(url_for('logout'))
+    flash('Email permissions granted.  Thanks!  :)')
+    return redirect(url_for('index'))
 
 
 @app.route('/add_search', methods=['POST'])
