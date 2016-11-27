@@ -22,22 +22,28 @@ class MenuEntry(db.Model):
                                          self.mensa,
                                          self.category, self.description)
 
+MAX_EMAIL_LENGTH = 256
+MAX_NICKNAME_LENGTH = 256
+MAX_SOCIAL_ID_LENGTH = 64
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    social_id = db.Column(db.String(64), nullable=False, unique=True)
-    nickname = db.Column(db.String(64), nullable=False)
-    email = db.Column(db.String(64), nullable=True)
+    social_id = db.Column(db.String(MAX_SOCIAL_ID_LENGTH), nullable=False, unique=True)
+    nickname = db.Column(db.String(MAX_NICKNAME_LENGTH), nullable=False)
+    email = db.Column(db.String(MAX_EMAIL_LENGTH), nullable=True)
     searches = db.relationship("SavedSearch", backref="owner", lazy='dynamic')
 
     def __repr__(self):
         return '<User %r>' % self.nickname
 
 
+MAX_SEARCH_LENGTH = 64
+
 class SavedSearch(db.Model):
     __tablename__ = 'searches'
     id = db.Column(db.Integer, primary_key=True)
-    search_terms = db.Column(db.String(64), nullable=False)
+    search_terms = db.Column(db.String(MAX_SEARCH_LENGTH), nullable=False)
     timestamp = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 

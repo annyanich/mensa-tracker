@@ -1,13 +1,13 @@
 """Add tables to store users and their saved search terms.
 
-Revision ID: d3ce41a7b4d3
+Revision ID: db2754bfb7bc
 Revises: 2334ba39b028
-Create Date: 2016-11-20 09:50:27.261748
+Create Date: 2016-11-27 13:11:31.434426
 
 """
 
 # revision identifiers, used by Alembic.
-revision = 'd3ce41a7b4d3'
+revision = 'db2754bfb7bc'
 down_revision = '2334ba39b028'
 
 from alembic import op
@@ -19,8 +19,8 @@ def upgrade():
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('social_id', sa.String(length=64), nullable=False),
-    sa.Column('nickname', sa.String(length=64), nullable=False),
-    sa.Column('email', sa.String(length=64), nullable=True),
+    sa.Column('nickname', sa.String(length=256), nullable=False),
+    sa.Column('email', sa.String(length=256), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('social_id')
     )
