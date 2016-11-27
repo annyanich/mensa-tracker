@@ -14,14 +14,18 @@ import re
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.route('/')
+@app.route('/mensa-history')
 def mensa_history():
     menu_entries = MenuEntry.query.order_by(MenuEntry.date_valid)
     return render_template('mensahistory.html', menu_entries=menu_entries)
 
-@app.route('/index.html')
+@app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 @app.route('/logout')
 def logout():
