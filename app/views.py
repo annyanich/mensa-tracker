@@ -150,6 +150,11 @@ def add_search():
         flash('You need to be logged in to do that.')
         return redirect(url_for('index'))
 
+    already_saved_searches = SavedSearch.query.filter_by(owner=current_user).all()
+    if len(already_saved_searches) >= 25:
+        flash('You can only have up to 25 saved searches.  Please delete some before you make more.')
+        return redirect(url_for('index'))
+
     search_terms = request.form['search_terms']
     if not search_terms:
         flash("You can't save a search with blank search terms.")
