@@ -1,5 +1,6 @@
 alembic==0.8.6
 beautifulsoup4==4.4.1
+celery==4.0.0
 cffi==1.5.0
 characteristic==14.3.0
 cryptography==1.2.2
@@ -38,4 +39,5 @@ SQLAlchemy==1.0.12
 Twisted==15.5.0
 w3lib==1.14.2
 Werkzeug==0.11.9
+yagmail==0.5.148
 zope.interface==4.1.3

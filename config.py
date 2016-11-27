@@ -44,3 +44,22 @@ if os.environ.get('FACEBOOK_APP_SECRET') is None:
 else:
     OAUTH_CREDENTIALS['facebook']['secret'] = os.environ['FACEBOOK_APP_SECRET']
 
+if os.environ.get('RABBITMQ_BIGWIG_URL') is None:
+    raise ValueError("The environment variable 'RABBITMQ_BIGWIG_URL' is missing.  "
+                     "Please specify it to allow email alerts to be queued up in RabbitMQ.  "
+                     "This is normally provided by the RabbitMQ Bigwig addon in Heroku.")
+else:
+    RABBITMQ_BIGWIG_URL = os.environ['RABBITMQ_BIGWIG_URL']
+
+if os.environ.get('GMAIL_USERNAME') is None:
+    raise ValueError("The environment variable 'GMAIL_USERNAME' is missing.  "
+                     "Please provide it so email alerts can be sent out with yagmail.")
+else:
+    GMAIL_USERNAME = os.environ['GMAIL_USERNAME']
+
+if os.environ.get('GMAIL_PASSWORD') is None:
+    raise ValueError("The environment variable 'GMAIL_PASSWORD' is missing.  "
+                     "Please provide it so email alerts can be sent out with "
+                     "yagmail.")
+else:
+    GMAIL_PASSWORD = os.environ['GMAIL_PASSWORD']
