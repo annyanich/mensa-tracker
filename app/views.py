@@ -70,13 +70,6 @@ def oauth_callback_authorize():
         flash('Authentication failed.')
         return redirect(url_for('index'))
 
-    if not is_email_granted:
-        flash(Markup(
-            'To send you email alerts, we need access to your email address.'
-            'To give us permission via Facebook, click <a href={0}>here.</a>'.format(
-                url_for('oauth_rerequest_permissions'))
-        ))
-
     user = User.query.filter_by(social_id=social_id).first()
     if not user:
         user = User(social_id=social_id, nickname=username, email=email)
