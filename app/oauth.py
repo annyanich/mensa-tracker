@@ -132,9 +132,18 @@ class FacebookSignIn(OAuthSignIn):
         permission_url = 'https://graph.facebook.com/v2.8/{user_id}/permissions/email'.format(
             user_id=user_id
         )
-        outcome = requests.delete(permission_url,
-                     params={'access_token': '{0}|{1}'.format(self.consumer_id, self.consumer_secret)})
-        outcome_json = json.loads(outcome.text)
+
+        try:
+            outcome = requests.delete(permission_url,
+                         params={'access_token': '{0}|{1}'.format(self.consumer_id, self.consumer_secret)})
+        except requests.exceptions.RequestException:
+            # TODO log this
+            return False
+        try:
+            outcome_json = json.loads(outcome.text)
+        except ValueError:
+            # TODO log this
+            return False
 
         answer = outcome_json.get('success') is True
         return answer
