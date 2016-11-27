@@ -114,7 +114,7 @@ class FacebookSignIn(OAuthSignIn):
                   'redirect_uri': callback_url}
         )
 
-        me = oauth_session.get('me', params={'fields': 'email,name'}).json()
+        me = oauth_session.get('me', params={'fields': 'email,name,first_name'}).json()
         email = me.get('email')
         permissions_json = oauth_session.get('/me/permissions').json()
 
@@ -123,7 +123,7 @@ class FacebookSignIn(OAuthSignIn):
 
         return (
             'facebook$' + me['id'],  # Social ID
-            me['name'],  # Nickname = user's real name
+            me['first_name'],  # Nickname = user's real name
             email,  # Email address
             is_email_granted
         )
