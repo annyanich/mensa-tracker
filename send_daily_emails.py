@@ -7,5 +7,5 @@ from email_alerter import celery_tasks
 
 if __name__ == '__main__':
     for recipient, subject, body in search_hits_to_emails(run_all_searches_for_tomorrow()):
-        celery_tasks.send_email(recipient, subject, body)
+        celery_tasks.send_email.delay(recipient, subject, body)
         # TODO log the emails we send out?
