@@ -10,7 +10,7 @@ You've signed up to receive email alerts when certain items appear in the mensa.
 Tomorrow, the following items matching your search terms are on the menu:
 
 {search_results}Guten Appetit!
-Your Mensa tracker team (http://mensa-tracker.herokuapp.com)
+Ann Yanich (http://mensa-tracker.herokuapp.com)
 """
 
 EMAIL_SUBJECT_TEMPLATE = "Mensa tracker alert for {date}"
