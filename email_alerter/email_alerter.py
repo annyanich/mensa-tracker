@@ -7,7 +7,7 @@ from itertools import groupby
 
 EMAIL_BODY_TEMPLATE = """Hi, {name}!
 You've signed up to receive email alerts when certain items appear in the mensa.
-Tomorrow, the following items matching your search terms are on the menu:
+Today, the following items matching your search terms are on the menu:
 
 {search_results}Guten Appetit!
 Ann Yanich (http://mensa-tracker.herokuapp.com)
@@ -16,12 +16,8 @@ Ann Yanich (http://mensa-tracker.herokuapp.com)
 EMAIL_SUBJECT_TEMPLATE = "Mensa tracker alert for {date}"
 
 
-def tomorrow():
-    return datetime.date.today() + datetime.timedelta(days=1)
-
-
-def menu_entries_tomorrow():
-    return MenuEntry.query.filter_by(date_valid=tomorrow()).all()
+def menu_entries_today():
+    return MenuEntry.query.filter_by(date_valid=datetime.date.today()).all()
 
 
 def does_search_match(search_terms, body):
@@ -30,14 +26,14 @@ def does_search_match(search_terms, body):
     return normalize_caseless(search_terms) in normalize_caseless(body)
 
 
-def run_all_searches_for_tomorrow():
+def search_hits_for_today():
     """
-    Run all the Saved Searches in the database against the menu entries for tomorrow.
+    Run all the Saved Searches in the database against the menu entries for today.
     :return: An iterator of pairs (SavedSearch, MenuEntry) with one pair for every time a search
     matches a menu entry.
     """
     for search in SavedSearch.query.all():
-        for entry in menu_entries_tomorrow():
+        for entry in menu_entries_today():
             if does_search_match(search.search_terms, entry.description):
                 yield (search, entry)
 
@@ -61,7 +57,7 @@ def search_hits_to_emails(search_hits):
     each tuple represents one email to be sent out.
     """
 
-    subject = EMAIL_SUBJECT_TEMPLATE.format(date=tomorrow().strftime("%A, %d.%m.%Y"))
+    subject = EMAIL_SUBJECT_TEMPLATE.format(date=datetime.date.today().strftime("%A, %d.%m.%Y"))
 
     # Use groupby to group the search hits by the owner of the search.
     # This produces a list of tuples: (User, iterator((SavedSearch1, MenuEntry1), (search2, entry2), ...))
@@ -84,7 +80,7 @@ def search_hits_to_emails(search_hits):
 
 
 def test_email_generation():
-    for recipient, subject, body in search_hits_to_emails(run_all_searches_for_tomorrow()):
+    for recipient, subject, body in search_hits_to_emails(search_hits_for_today()):
         print("Recipient: {0}\n"
               "Subject: {1}\n"
               "Body: {2}\n".format(recipient, subject, body))
