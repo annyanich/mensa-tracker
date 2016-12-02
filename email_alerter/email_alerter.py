@@ -1,9 +1,7 @@
-from app.models import SavedSearch, MenuEntry
+from app.models import SavedSearch, MenuEntry, User
 
 import datetime
 import unicodedata
-
-from itertools import groupby
 
 EMAIL_BODY_TEMPLATE = """Hi, {name}!
 You've signed up to receive email alerts when certain items appear in the mensa.
@@ -26,18 +24,6 @@ def does_search_match(search_terms, body):
     return normalize_caseless(search_terms) in normalize_caseless(body)
 
 
-def search_hits_for_today():
-    """
-    Run all the Saved Searches in the database against the menu entries for today.
-    :return: An iterator of pairs (SavedSearch, MenuEntry) with one pair for every time a search
-    matches a menu entry.
-    """
-    for search in SavedSearch.query.all():
-        for entry in menu_entries_today():
-            if does_search_match(search.search_terms, entry.description):
-                yield (search, entry)
-
-
 def menu_entry_to_text(entry):
     return ("{date_valid}\n"
             "{mensa}: {category}\n"
@@ -49,38 +35,41 @@ def menu_entry_to_text(entry):
     )
 
 
-def search_hits_to_emails(search_hits):
+def email_alerts_for_today():
     """
-    :param search_hits: A list of two-tuples of the form (SavedSearch, MenuEntry), whereby
-    each menu entry is a hit for the corresponding search.
+    For each user, run their saved searches.  Write an email to them if they have
+    search results.
+
     :return: A list of three-tuples of the form (Email Recipient, Subject, Body), whereby
     each tuple represents one email to be sent out.
     """
 
-    subject = EMAIL_SUBJECT_TEMPLATE.format(date=datetime.date.today().strftime("%A, %d.%m.%Y"))
+    email_subject = EMAIL_SUBJECT_TEMPLATE.format(date=datetime.date.today().strftime("%A, %d.%m.%Y"))
 
-    # Use groupby to group the search hits by the owner of the search.
-    # This produces a list of tuples: (User, iterator((SavedSearch1, MenuEntry1), (search2, entry2), ...))
-    for search_owner, hits_for_user in groupby(search_hits, lambda x: x[0].owner):
+    for user in User.query.all():
         formatted_search_results = ""
 
-        # Group multiple hits for the same search together.
-        for search, hits_for_search in groupby(hits_for_user, lambda x: x[0]):
-            formatted_search_results += ('Search: "{0}"\n\n'.format(search.search_terms))
+        for search in SavedSearch.query.filter_by(owner=user).all():
+            search_results = [menu_entry for menu_entry in menu_entries_today()
+                              if does_search_match(search.search_terms, menu_entry.description)]
 
-            # Put a blank line after each search result.
-            for _, menu_entry in hits_for_search:
-                formatted_search_results += menu_entry_to_text(menu_entry) + "\n\n"
+            if search_results:
+                formatted_search_results += ('Search: "{0}"\n\n'.format(search.search_terms))
+                for menu_entry in search_results:
+                    formatted_search_results += menu_entry_to_text(menu_entry) + "\n\n"
+
+        if formatted_search_results == "":
+            continue;  # Do not send an email if there are no search results.
 
         # Fill out the email body template with the information we have gathered
-        body = EMAIL_BODY_TEMPLATE.format(name=search_owner.nickname,
-                                          search_results=formatted_search_results)
+        email_body = EMAIL_BODY_TEMPLATE.format(name=user.nickname,
+                                                search_results=formatted_search_results)
 
-        yield (search_owner.email, subject, body)
+        yield (user.email, email_subject, email_body)
 
 
 def test_email_generation():
-    for recipient, subject, body in search_hits_to_emails(search_hits_for_today()):
+    for recipient, subject, body in email_alerts_for_today():
         print("Recipient: {0}\n"
               "Subject: {1}\n"
               "Body: {2}\n".format(recipient, subject, body))
