@@ -21,9 +21,15 @@ sudo -u postgres createuser --superuser vagrant
 sudo -u postgres createdb vagrant
 sudo -u postgres psql -c "ALTER USER vagrant WITH PASSWORD 'password';"
 
-# Set up RabbitMQ (used to queue up emails)
-rabbitmqctl add_user devuser test123 #username password
-rabbitmqctl add_vhost devvhost
-# Set permissions for our RabbitMQ user.  (Configuration, Read, Write)
-# See https://www.rabbitmq.com/man/rabbitmqctl.1.man.html#set_permissions
-rabbitmqctl set_permissions -p devvhost devuser ".*" ".*" ".*"
+# Enable the RabbitMQ web UI, which you can access at http://192.168.56.2:15672
+# (Replace 192.168.56.2 with your VM's IP, if you changed it in Vagrantfile.)
+# Username: guest
+# Password: guest
+# This lets you peek at the emails in the queue.
+rabbitmq-plugins enable rabbitmq_management
+/etc/init.d/rabbitmq-server restart
+
+# Upgrade the app's db to the latest version
+export DATABASE_URL='postgres://vagrant@localhost:5432/vagrant'
+export PGPASSWORD='password'
+cd /vagrant && python3 /vagrant/run.py db upgrade
