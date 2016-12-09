@@ -18,7 +18,21 @@ else:
 # but Flask will throw a warning unless we explicitly set it to False ourselves.
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-DEBUG = None
+if os.environ.get('DEBUG') is None:
+    print('The environment variable "DEBUG" is not set.  '
+          'It is used to determine whether debugging is enabled for Flask.  '
+          'Defaulting to DEBUG=False.')
+    DEBUG = False
+else:
+    val = os.environ['DEBUG']
+    if val == 'True' or val == 'False':
+        DEBUG = val
+    else:
+        print('The environment variable "DEBUG" (used by Flask) has an '
+              'inappropriate value: {0}. Only "True" or "False" are accepted. '
+              ' Defaulting to DEBUG=False.'.format(val))
+        DEBUG = False
+
 
 # SECRET_KEY is a cryptographic secret used by Flask.
 if os.environ.get('SECRET_KEY') is None:
