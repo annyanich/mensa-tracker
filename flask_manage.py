@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from app import app, db
+from flask_app import app, db
 
 from flask_script import Manager
 

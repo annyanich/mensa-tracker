@@ -3,7 +3,7 @@
 # into my database format.
 import re
 import datetime
-import menuscraper.items
+import menu_scraper.items
 
 
 # The details in the summary attribute always say "Ausgabe B (aktuelle
@@ -139,7 +139,7 @@ def parse_table(menu_table):
                 .replace('Ã¶', 'ö')\
                 .replace('Ã¤', 'ä')\
                 .replace('ÃŸ', 'ß')  # TODO Can this be fixed a nicer way?
-            yield menuscraper.items.MenuEntry(
+            yield menu_scraper.items.MenuEntry(
                 # price=category_price,
                 mensa="Uhlhornsweg Ausgabe A",
                 category=category_name,

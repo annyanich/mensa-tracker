@@ -1,4 +1,4 @@
-from app import db
+from flask_app import db
 from flask.ext.login import UserMixin
 from sqlalchemy import UniqueConstraint
 

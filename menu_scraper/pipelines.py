@@ -5,8 +5,8 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-from app import db
-from app.models import MenuEntry as DBMenuEntry
+from flask_app import db
+from flask_app.models import MenuEntry as DBMenuEntry
 from scrapy.exceptions import DropItem
 
 

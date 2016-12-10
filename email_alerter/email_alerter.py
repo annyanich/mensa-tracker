@@ -1,4 +1,4 @@
-from app.models import SavedSearch, MenuEntry, User
+from flask_app.models import SavedSearch, MenuEntry, User
 
 import datetime
 import unicodedata

@@ -11,8 +11,8 @@
 
 BOT_NAME = 'Mensa Menu Scraper'
 
-SPIDER_MODULES = ['menuscraper.spiders']
-NEWSPIDER_MODULE = 'menuscraper.spiders'
+SPIDER_MODULES = ['menu_scraper.spiders']
+NEWSPIDER_MODULE = 'menu_scraper.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -66,8 +66,8 @@ CONCURRENT_REQUESTS = 1
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 # Items go through from lower valued to higher valued classes.
 ITEM_PIPELINES = {
-   'menuscraper.pipelines.FilterDuplicates': 100,
-   'menuscraper.pipelines.SaveToDatabase': 200
+   'menu_scraper.pipelines.FilterDuplicates': 100,
+   'menu_scraper.pipelines.SaveToDatabase': 200
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

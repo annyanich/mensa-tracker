@@ -32,4 +32,4 @@ rabbitmq-plugins enable rabbitmq_management
 # Upgrade the app's db to the latest version
 export DATABASE_URL='postgres://vagrant@localhost:5432/vagrant'
 export PGPASSWORD='password'
-cd /vagrant && python3 /vagrant/run.py db upgrade
+cd /vagrant && python3 /vagrant/flask_manage.py db upgrade

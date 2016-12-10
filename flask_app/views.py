@@ -1,6 +1,6 @@
-from app import app, db, lm
-from app.models import User, SavedSearch, MenuEntry, MAX_SEARCH_LENGTH
-from app.oauth import OAuthSignIn, FacebookSignIn
+from flask_app import app, db, lm
+from flask_app.models import User, SavedSearch, MenuEntry, MAX_SEARCH_LENGTH
+from flask_app.oauth import OAuthSignIn, FacebookSignIn
 
 from flask import redirect, url_for, flash, render_template, request, Markup
 from flask.ext.login import current_user, login_user, logout_user

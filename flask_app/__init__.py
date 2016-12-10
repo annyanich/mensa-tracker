@@ -14,10 +14,10 @@ db = SQLAlchemy(app)
 lm = LoginManager(app)
 lm.login_view = 'index'
 
-from app import views, models
+from flask_app import views, models
 
 # Expose datetime-formatting functions to all templates
-from app.momentjs import Momentjs
+from flask_app.momentjs import Momentjs
 app.jinja_env.globals['Momentjs'] = Momentjs
 
 app.logger.addHandler(logging.StreamHandler(sys.stdout))

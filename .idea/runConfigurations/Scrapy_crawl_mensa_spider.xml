@@ -9,13 +9,13 @@
       <env name="PGPASSWORD" value="password" />
     </envs>
     <option name="SDK_HOME" value="vagrant://$PROJECT_DIR$/usr/bin/python3" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/menuscraper" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/menu_scraper" />
     <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <module name="mensa-tracker" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/menuscraper/main.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/menu_scraper/main.py" />
     <option name="PARAMETERS" value="" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <method />

@@ -1,7 +1,7 @@
 import scrapy
 
 from bs4 import BeautifulSoup
-from menuscraper.soup_parser import get_all_menu_items
+from menu_scraper.soup_parser import get_all_menu_items
 
 
 class MensaSpider(scrapy.Spider):
