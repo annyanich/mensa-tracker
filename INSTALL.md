@@ -40,10 +40,29 @@ In case you haven't used Vagrant before, here are some useful commands:
 messed the VM up, or if you made some changes to bootstrap.sh, requirements.txt 
 and would like to verify that they work as expected.
 
-### Create a Heroku app and configure addons (if deploying to Heroku)
+### Create a Heroku app and configure addons
+You can skip this section if you just want to run the app locally.
 
-Register at heroku.com, log in, and define a new app there.  The process is 
-self-explanatory.
+Register at heroku.com, log in, and define a new app there.  Give it a name,
+e.g. 'my-mensa-tracker'.  
+
+Then, in the root directory of our project, run 
+`heroku git:remote --app my-mensa-tracker`.  This will associate your local
+git repository with the app you have created in Heroku. Specifically, it adds a 
+git remote called `heroku` to your repo.  
+
+The `heroku` command looks at this
+git remote to figure out what app your commands should refer to.  E.g. if you run 
+`heroku addons:create <addon name>`, normally you would have to add an 
+additional `--app <heroku app name>` parameter so Heroku knows which app you're 
+adding the addon to, but if you already ran `git:remote --app my-mensa-tracker`, then you don't have to include `--app my-mensa-tracker`
+to any future commands you run.  
+
+Finally, run `git push heroku release:master`.  This will deploy the latest
+release of our project to your app in Heroku.  You can deploy different versions
+by changing the branch name that you give to this command.  For example, if you 
+were working on a feature in a local branch `cool-new-feature`, and you wanted to 
+test it out on Heroku, you would run `git push heroku cool-new-feature:master`.
 
 We want the addons for RabbitMQ, PostgreSQL, the Heroku Scheduler, 
 and Papertrail (which logs the output of any commands we run). These are all free.
@@ -62,6 +81,15 @@ password.
 The addons don't require any further configuration, except for the scheduler, 
 which we will get to shortly. 
 
+If you are deploying the app for other people to use, I would recommend creating
+a staging app as well.  Heroku makes this easy using the `heroku fork` command:  
+`heroku fork --from my-mensa-tracker --to my-mensa-tracker-staging`
+This copies your config vars and addons.
+It will also make a copy of your database, assuming you use `heroku-postgresql`. 
+ 
+ After you do that, you can create an App Pipeline to allow you to easily deploy
+ code first to staging, and then to production after you verify that it works as 
+ expected in staging.
 ### Set up a Gmail account to send email alerts
 
 Create a new Gmail account and open 
@@ -79,7 +107,8 @@ Heroku app, i.e. `http://(your app name).herokuapp.com`.
 For local development, you should point the URL to to the local URL of
 your vagrant VM, e.g. 
 `http://192.168.56.2:5000`.  
-You should define a separate Facebook app for development and for deployment.
+You should define separate Facebook apps for local development, staging, and 
+deployment.
 
 ### Configure environment variables (in Heroku) 
 Open the settings for your app in Heroku's web interface.  
@@ -103,10 +132,14 @@ the Python function os.urandom() inside of an interactive Python shell:
     Copy and paste that big random blob into Heroku's settings, and you're golden. 
 
 ### Configure environment variables (locally)
-Open up ".env" in a text editor and configure 
-the same environment variables inside of there as described above.  
+If you use PyCharm, there are already run configurations for Flask,
+Scrapy, and `queue_daily_emails.py` included in this repo under 
+`.idea/runConfigurations`, and they already have all the environment variables
+  they need, except for Flask.  For Flask, you have to add your own 
+  `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET`, and a `SECRET_KEY`.
 
-The command `heroku local` loads up those environment variables as if they were 
+If you want to use `heroku local` to run your app, open up ".env" in a text editor and configure 
+the same environment variables inside of there as described above. `heroku local` loads up those environment variables as if they were 
 configured inside of Heroku's web interface. 
 
 ### Initialize the database 
@@ -153,9 +186,9 @@ timeout 120s celery worker --app=email_alerter.celery_tasks.app
 I normally run them all after midnight.  
 
 In Heroku, you can enter them in the Scheduler addon's web interface.
-It can be found [here.]https://scheduler.heroku.com/dashboard
+There's a link to it in your Heroku app's dashboard.  
 
-Outside of Heroku, you could use cron.
+If you want to deploy this app outside of Heroku, you could use cron instead.
 
 # Tips for developers  
 ### IDE run configurations  
