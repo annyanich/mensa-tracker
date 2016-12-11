@@ -18,6 +18,9 @@
 
     <!--Moment.js library for formatting dates and times nicely-->
     <script src="../static/js/moment.min.js"></script>
+
+
+
   </head>
 
   <body>
@@ -156,14 +159,17 @@
     <script src="../static/js/jquery-1.11.3.js"></script>
     <script>window.jQuery || document.write('<script src="../static/bootstrap-3.3.6-src/docs/assets/js/vendor/jquery.min.js"><\/script>')</script>
     <script src="../static/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../static/bootstrap-3.3.6-src/docs/assets/js/ie10-viewport-bug-workaround.js"></script>
 {#    <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>#}
+
     <script src="../static/datatables/datatables.js"></script>
+    <script src="../static/js/datetime-moment.js"></script>
 
      <script>
          var table;
          $(document).ready(function() {
+             // Use datetime-moment.js to help us sort these dates properly
+          $.fn.dataTable.moment('DD.MM.YYYY');
+
           table = $('#menu_entries').DataTable( {
               "order": [[0, "desc"]],
               "searching": false,
