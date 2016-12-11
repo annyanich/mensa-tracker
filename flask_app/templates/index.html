@@ -179,6 +179,9 @@
 
         function runSearch() {
             var terms = document.testsearch.search_terms.value;
+            if (terms == "") {
+                return; // Don't run the search with empty search terms
+            }
             jQuery.post('/test_search', {
                 search_terms: terms
             }).done(function(results) {

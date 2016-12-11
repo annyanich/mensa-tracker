@@ -26,12 +26,14 @@ def test_search():
     matches = [menu_entry for menu_entry in MenuEntry.query.all()
                if menu_entry.does_search_match(request.form['search_terms'])]
     matches.sort(key=lambda entry: entry.date_valid, reverse=True)
+    # TODO figure out why this appears to only sort based on the day of the month,
+    # so that November 30 comes before December 29 (because 30 > 29 presumably)
 
     result_dict = {'result %s' % entry.id:
                     {'date_valid': entry.date_valid.strftime("%d.%m.%Y"),
                      'mensa': entry.mensa,
                      'description': entry.description,
-                     'category': entry.category} for entry in matches}
+                     'category': entry.category} for entry in matches[:25]}
 
     return jsonify(result_dict)
 
