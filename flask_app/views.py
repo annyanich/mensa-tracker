@@ -12,6 +12,14 @@ import datetime
 import re
 
 
+@app.before_request
+def before_request():
+    """Force all requests to use https"""
+    if request.url.startswith('http://'):
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
+
 @lm.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
