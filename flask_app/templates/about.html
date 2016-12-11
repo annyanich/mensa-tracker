@@ -81,11 +81,11 @@
         <h2>(Unofficial) Mensa Tracker</h2>
           <h3>By Ann Yanich</h3><br>
           <p class="text-left">
-              Hi! I'm Ann.  I study computer science at the Universität Oldenburg.  This is a side project of mine. <br><br>
-              This website presents historical data from the <a href="http://www.studentenwerk-oldenburg.de/de/gastronomie/speiseplaene.html">
-            menu of my university's Mensa.</a><br>
-            It also offers you the chance to receive email notifications when dishes appear on the menu
-              whose names match search terms you specify.<br><br>
+              Hi! I'm Ann.  I study computer science at the Universität Oldenburg.  This website is a side project of mine. <br>
+            If you <a href="{{ url_for('oauth_authorize', provider='facebook') }}">
+              log in</a>, you can sign up to receive email notifications when dishes with certain
+              key words appear on the <a href="http://www.studentenwerk-oldenburg.de/de/gastronomie/speiseplaene.html">
+            menu of my university's Mensa.</a>.<br><br>
               I make no guarantee of the correctness or completeness of the data presented here.<br>
               Click <a href="http://www.studentenwerk-oldenburg.de/de/gastronomie/speiseplaene.html">
               here</a> to see the current official menu plan of the Mensa.

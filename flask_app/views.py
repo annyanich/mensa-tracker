@@ -2,9 +2,11 @@ from flask_app import app, db, lm
 from flask_app.models import User, SavedSearch, MenuEntry, MAX_SEARCH_LENGTH
 from flask_app.oauth import OAuthSignIn, FacebookSignIn
 
-from flask import redirect, url_for, flash, render_template, request, Markup
+from flask import redirect, url_for, flash, render_template, request, jsonify
 from flask.ext.login import current_user, login_user, logout_user
 from sqlalchemy import exc
+
+from flask_app.models import MenuEntry
 
 import datetime
 import re
@@ -13,6 +15,25 @@ import re
 @lm.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+@app.route('/index')
+def index_test():
+    return render_template('index_test.html')
+
+
+@app.route('/test_search', methods=['POST'])
+def test_search():
+    matches = [menu_entry for menu_entry in MenuEntry.query.all()
+               if menu_entry.does_search_match(request.form['search_terms'])]
+    matches.sort(key=lambda entry: entry.date_valid, reverse=True)
+
+    result_dict = {'result %s' % entry.id:
+                    {'date_valid': entry.date_valid.strftime("%d.%m.%Y"),
+                     'mensa': entry.mensa,
+                     'description': entry.description,
+                     'category': entry.category} for entry in matches}
+
+    return jsonify(result_dict)
 
 @app.route('/mensa-history')
 def mensa_history():

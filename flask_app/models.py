@@ -2,6 +2,7 @@ from flask_app import db
 from flask.ext.login import UserMixin
 from sqlalchemy import UniqueConstraint
 
+import unicodedata
 
 class MenuEntry(db.Model):
     __tablename__ = 'menu_entries'
@@ -21,6 +22,22 @@ class MenuEntry(db.Model):
                'Description: {4}'.format(self.time_scraped, self.date_valid,
                                          self.mensa,
                                          self.category, self.description)
+
+    def to_pretty_text(self):
+        return ("{date_valid}\n"
+                "{mensa}: {category}\n"
+                "{description}").format(
+            description=self.description.replace("\n", " "),
+            mensa=self.mensa,
+            category=self.category,
+            date_valid=self.date_valid.strftime("%A, %d.%m.%Y")
+        )
+
+    def does_search_match(self, search_terms):
+        def normalize_caseless(text):
+            return unicodedata.normalize("NFKD", text.casefold())
+
+        return normalize_caseless(search_terms) in normalize_caseless(self.description)
 
 MAX_EMAIL_LENGTH = 256
 MAX_NICKNAME_LENGTH = 256
