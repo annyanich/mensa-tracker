@@ -65,8 +65,8 @@
 
     <div class="container">
         <h1>Welcome to Ann's Mensa Tracker</h1>
-        <p>Ann's Mensa Tracker can send you emails when your favorite dishes show
-            up on the menu in your university's Mensa.</p>
+        <p>Hi!  My Mensa Tracker can send you emails when your favorite dishes show
+            up on the menu in the Mensa.</p>
 
       {% for message in get_flashed_messages() %}
         <p><b>Alert</b>: {{ message }}</p>
@@ -91,19 +91,41 @@
           <div class="row">
         <div class="col-sm-12">
             Type in part of the name of a dish you like to see
-            a list of items that it would match.  </div></div> <br />
-          <div class="row">
+            a list of items that it would match.  </div></div>
+        <br />
+        <form name="testsearch" action="/add_search" method="POST">
+        <div class="row">
             <div class="col-sm-12">
-                <form name="testsearch" action="/add_search" method="POST">
-                    <input type="text" name="search_terms" id="search_terms"
-                           placeholder="Search terms" autocomplete="off" />
-                    <input type="submit" value="Save Search" />
-                </form></div></div> <br/>
+                <label class="control-label" for="search_terms">Search terms</label>
+            <input type="text" name="search_terms" id="search_terms"
+                   placeholder="e.g. Bolognese, Schafkäse, Vanillesauce" autocomplete="off"
+                   class="form-control"/></div>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="col-sm-12">
+             <input type="submit" class="form-control btn btn-primary btn-block" value="Save Search" />
+            </div>
+        </div>
+        </form>
 
-          <div class="row">
-          <div class="col-sm-7">
-              <span id="searchresults-placeholder" style="white-space: pre;"></span>
-              <table id="menu_entries" class="table table-striped">
+        <div class="row">
+        <div class="col-sm-12">
+            <form action="javascript:saveSearch()">
+                <button class="btn btn-md btn-default" type="submit" value="Save Search">Save search</button>
+            </form>
+        </div>
+        </div><br/>
+
+      <div class="row">
+        <div class="col-sm-7">
+              <span id="searchresults-placeholder"
+{#                    style="white-space: pre;"#}
+              >
+{#                  Your search results will appear here.#}
+              </span>
+              <span id="menu_entries_table_container">
+              <table id="menu_entries_table" class="table table-striped">
                 <thead><tr>
                     <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Date</th>
                     <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Mensa</th>
@@ -111,15 +133,13 @@
                     <th class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Item description</th>
                 </tr></thead>
                 <tbody>
-            </tbody></table>
+                </tbody>
+              </table></span>
           </div>
 
-              <div class="col-sm-5">
+          <div class="col-sm-5">
           {% if current_user.is_authenticated and current_user.searches.all() %}
             <h4>Here are your saved searches:</h4> <br/>
-              {% else %}
-              <h4>Your saved searches will appear below.</h4>
-              {% endif %}
             <table class="table table-striped table-bordered table-condensed table-vcenter">
               <thead><tr>
                   <th>Search terms</th>
@@ -127,7 +147,6 @@
                   <th class="text-center">Actions</th>
                 </tr></thead>
               <tbody>
-              {% if current_user.is_authenticated %}
                 {% for search in current_user.searches.all() %}
                   <tr>
                     <td>"{{ search.search_terms }}"</td>
@@ -138,10 +157,25 @@
                     <form action="javascript:setSearchTerms('{{ search.search_terms }}'); runSearch();">
                         <button class="btn btn-md btn-default" type="submit" value="Test search">Test</button>
                     </form></td></tr>
-                {% endfor %} {% endif %}
-              </tbody>
-            </table>
-              </div>
+                {% endfor %}
+              </tbody></table> {% else %}
+{#                  Show some example searches#}
+              <h4>Your saved searches will appear below.
+              Here are some examples of searches for you to try: </h4>
+              <table class="table table-striped table-bordered table-condensed table-vcenter">
+{#              <thead><tr>#}
+{#                  <th>Search terms</th>#}
+{#                  <th class="text-center"></th>#}
+{#                </tr></thead>#}
+              <tbody>
+                  <tr><td width="100%">"Bolognese"</td>
+                  <td class="text-center"><form action="javascript:setSearchTerms('Bolognese'); runSearch();">
+                        <button class="btn btn-lg btn-default" type="submit" value="Test search">Test search</button>
+                    </form></td></tr>
+              </tbody></table>
+
+              {% endif %}
+          </div>
 
 
           </div>
@@ -170,14 +204,25 @@
              // Use datetime-moment.js to help us sort these dates properly
           $.fn.dataTable.moment('DD.MM.YYYY');
 
-          table = $('#menu_entries').DataTable( {
+          table = $('#menu_entries_table').DataTable( {
               "order": [[0, "desc"]],
               "searching": false,
               "pageLength": 5,
-              "lengthChange": false
+              "lengthChange": false,
+              "fnInitComplete": function(oSettings, json) {
+                    $('#menu_entries_table_container').hide();  // Hide the table by default
+              },
+              "language": {
+                  "emptyTable": "No search results found.", // Hide "No data available in table"
+                  "info": "Showing _START_ to _END_ of _TOTAL_ search results."
+              }
           });
 
          } );
+
+         function showTable() {
+             $('#menu_entries_table_container').show()
+         }
 
          function setSearchTerms(terms) {
              document.testsearch.search_terms.value = terms;
@@ -186,7 +231,7 @@
         function runSearch() {
             var terms = document.testsearch.search_terms.value;
             if (terms == "") {
-                return; // Don't run the search with empty search terms
+                return;
             }
             jQuery.post('/test_search', {
                 search_terms: terms
@@ -202,6 +247,7 @@
                         data['description']
                     ]).draw(false);
                 })
+                showTable();
             }).fail(function(error) {
                 document.getElementById('searchresults-placeholder').textContent =
                     "We seem to be having trouble running your search.  " +
@@ -217,9 +263,9 @@
           };
         };
 
-        {#   Only run the search after the user stops typing for a second.
+        {#   Only run the search after the user stops typing for 500 ms.
              This prevents excessive server load.  #}
-        var debounce = makeDelay(750);
+        var debounce = makeDelay(500);
 
         $("#search_terms").keyup(function(){
             debounce(runSearch);
