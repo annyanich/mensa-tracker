@@ -12,13 +12,20 @@ import datetime
 import re
 
 
-@app.before_request
-def before_request():
-    """Force all requests to use https"""
-    if request.url.startswith('http://'):
-        url = request.url.replace('http://', 'https://', 1)
-        code = 301
-        return redirect(url, code=code)
+# @app.before_request
+# def before_request():
+#     """Force all requests to use https"""
+#     if request.url.startswith('http://'):
+#         url = request.url.replace('http://', 'https://', 1)
+#         code = 301
+#         return redirect(url, code=code)
+
+def json_failed(reason):
+    return jsonify({
+        "status": "failed",
+        "reason": reason
+    })
+
 
 @lm.user_loader
 def load_user(user_id):
@@ -208,6 +215,43 @@ def add_search():
         flash('Something went wrong while saving your search in our database.')
         db.session.rollback()
     return redirect(url_for('index'))
+
+
+@app.route('/add_search_ajax', methods=['POST'])
+def add_search_ajax():
+    if current_user.is_anonymous:
+        return json_failed("You need to be logged in to save a search.")
+
+    already_saved_searches = SavedSearch.query.filter_by(owner=current_user).all()
+    if len(already_saved_searches) >= 25:
+        return json_failed('You can only have up to 25 saved searches.  '
+                           'Please delete some before you make more.')
+
+    search_terms = request.form['search_terms']
+    if not search_terms:
+        return json_failed("You can't save a search with blank search terms.")
+
+    if len(search_terms) > MAX_SEARCH_LENGTH:
+        return json_failed("The entered search criteria are too long "
+                           "({0} characters.)  Please limit your search's "
+                           "length to {1} characters.".format(len(search_terms),
+                                                              MAX_SEARCH_LENGTH))
+
+    search = SavedSearch(owner=current_user,
+                         search_terms=search_terms,
+                         timestamp=datetime.datetime.utcnow())
+    try:
+        db.session.add(search)
+        db.session.commit()
+        return jsonify({
+            "status": "success",
+            "search_id": search.id
+        })
+    except exc.SQLAlchemyError:
+        #  TODO log this
+        db.session.rollback()
+        return json_failed('Something went wrong while saving your search in our '
+                    'database.')
 
 
 @app.route('/savedsearches/<int:search_id>/delete', methods=['POST'])

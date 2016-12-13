@@ -108,11 +108,11 @@
             </div>
         </div>
         </form>
-
+        <br/>
         <div class="row">
         <div class="col-sm-12">
             <form action="javascript:saveSearch()">
-                <button class="btn btn-md btn-default" type="submit" value="Save Search">Save search</button>
+                <input class="form-control btn btn-primary btn-block" type="submit" value="Save Search"></input>
             </form>
         </div>
         </div><br/>
@@ -140,7 +140,8 @@
           <div class="col-sm-5">
           {% if current_user.is_authenticated and current_user.searches.all() %}
             <h4>Here are your saved searches:</h4> <br/>
-            <table class="table table-striped table-bordered table-condensed table-vcenter">
+            <table class="table table-striped table-bordered table-condensed table-vcenter"
+                    id="saved_searches_table">
               <thead><tr>
                   <th>Search terms</th>
                   <th>Date created</th>
@@ -200,6 +201,9 @@
 
      <script>
          var table;
+
+         var saved_searches_datatable;
+
          $(document).ready(function() {
              // Use datetime-moment.js to help us sort these dates properly
           $.fn.dataTable.moment('DD.MM.YYYY');
@@ -218,6 +222,11 @@
               }
           });
 
+
+          saved_searches_datatable = $('#saved_searches_table').DataTable( {
+            "info": false
+          });
+
          } );
 
          function showTable() {
@@ -226,6 +235,49 @@
 
          function setSearchTerms(terms) {
              document.testsearch.search_terms.value = terms;
+         }
+
+         function html_delete_button(search_id) {
+             html = '<form action="/savedsearches/' + search_id + '/delete" method="POST">';
+             html += '<button class="btn btn-md btn-danger" type="submit" value="Delete">Delete</button>';
+             html += '</form>';
+             return html;
+         }
+
+         function html_test_search_button(search_terms) {
+            html = "<form action=\"javascript:setSearchTerms('" + search_terms;
+            html += "'); runSearch();\">";
+            html += '<button class="btn btn-md btn-default" type="submit" value="Test search">Test</button>';
+            html += '</form>';
+            return html;
+         }
+
+         function saveSearch() {
+{#             alert("This button not yet implemented");#}
+             var terms = document.testsearch.search_terms.value;
+             if (terms == "") {
+                 alert("Please enter some search terms.");
+                 return;
+             }
+
+             jQuery.post('/add_search_ajax', {
+                 search_terms: terms
+             }).done(function(results) {
+                 status = results['status']
+                 if (status == 'success') {
+                    alert("Search saved.  Id: " + results['search_id']);
+                    saved_searches_datatable.row.add( [
+                        '"' + terms + '"',
+                        'Just now',
+                        html_delete_button(results['search_id'])
+                        + html_test_search_button(terms)
+                    ]).draw(false);
+                 } else if (status == 'failed') {
+                     alert(results['reason']);
+                 }
+             }).fail(function(error) {
+                 alert("Error: Search not saved?");
+             })
          }
 
         function runSearch() {
