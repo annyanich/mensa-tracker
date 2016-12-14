@@ -185,41 +185,6 @@ def oauth_callback_rerequest_permissions():
 @app.route('/add_search', methods=['POST'])
 def add_search():
     if current_user.is_anonymous:
-        flash('You need to be logged in to do that.')
-        return redirect(url_for('index'))
-
-    already_saved_searches = SavedSearch.query.filter_by(owner=current_user).all()
-    if len(already_saved_searches) >= 25:
-        flash('You can only have up to 25 saved searches.  Please delete some before you make more.')
-        return redirect(url_for('index'))
-
-    search_terms = request.form['search_terms']
-    if not search_terms:
-        flash("You can't save a search with blank search terms.")
-        return redirect(url_for('index'))
-    if len(search_terms) > MAX_SEARCH_LENGTH:
-        flash("The entered search criteria are too long ({0} characters.)  "
-              "Please limit your search's length to {1} characters.".format(len(search_terms),
-                                                                            MAX_SEARCH_LENGTH))
-        return redirect(url_for('index'))
-
-    search = SavedSearch(owner=current_user,
-                         search_terms=search_terms,
-                         timestamp=datetime.datetime.utcnow())
-    try:
-        db.session.add(search)
-        db.session.commit()
-        flash('Search saved.')
-    except exc.SQLAlchemyError:
-        #  TODO log this
-        flash('Something went wrong while saving your search in our database.')
-        db.session.rollback()
-    return redirect(url_for('index'))
-
-
-@app.route('/add_search_ajax', methods=['POST'])
-def add_search_ajax():
-    if current_user.is_anonymous:
         return json_failed("You need to be logged in to save a search.")
 
     already_saved_searches = SavedSearch.query.filter_by(owner=current_user).all()
@@ -250,32 +215,32 @@ def add_search_ajax():
     except exc.SQLAlchemyError:
         #  TODO log this
         db.session.rollback()
-        return json_failed('Something went wrong while saving your search in our '
-                    'database.')
+        return json_failed('Something went wrong while saving your search in'
+                           ' our database.')
 
 
 @app.route('/savedsearches/<int:search_id>/delete', methods=['POST'])
 def delete_search(search_id):
     if current_user.is_anonymous:
-        flash('You need to be logged in to do that.')
-        return redirect(url_for('index'))
+        return json_failed("You need to be logged in to delete a search.")
 
     search = SavedSearch.query.filter_by(id=search_id).first()
     if (not search) or (search.owner != current_user):
-        flash('Invalid search id.  Either the given search id does not exist, '
-              'or it does not belong to you.')
-        return redirect(url_for('index'))
+        return json_failed('Invalid search id.  Either the given search id does'
+                           ' not exist, or it does not belong to you.')
 
     try:
         db.session.delete(search)
         db.session.commit()
-        flash('Deleted search: %r' % search.search_terms)
-        return redirect(url_for('index'))
+        return jsonify({
+            'status': 'success',
+            'search_id': search.id,
+            'search_terms': search.search_terms
+        })
     except exc.SQLAlchemyError:
         #  TODO log this
-        flash('Something went wrong while deleting your search from our database.')
-        return redirect(url_for('index'))
-
+        return json_failed('Something went wrong while deleting your search '
+                           'from our database.')
 
 
 @app.route('/delete_email_address')
