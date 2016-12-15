@@ -1,0 +1,9 @@
+/*td { font-size: 20px; }*/
+table.saved-searches tbody td {
+    vertical-align: middle;
+    font-size: 16px;
+}
+.btn-group {
+    /* Prevents our button group from getting split up by line wrapping */
+    display: flex;
+}
