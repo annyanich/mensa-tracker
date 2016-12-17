@@ -261,7 +261,7 @@
          }
 
          function saveSearch() {
-             var terms = document.testsearch.search_terms.value;
+             var terms = getSearchTerms().trim();
              if (terms == "") {
                  alert("Please enter some search terms.");
                  return;
@@ -290,7 +290,7 @@
 
 
         function runSearch() {
-            var terms = getSearchTerms();
+            var terms = getSearchTerms().trim();
             if (terms == "") {
                 return;
             }
