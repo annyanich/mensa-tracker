@@ -53,7 +53,6 @@
             <li><a href="{{ url_for('about') }}">About</a></li>
             <li><a href="mailto:ann.yanich@gmail.com">Contact</a></li>
             {% if current_user.is_authenticated %}
-{#            <li><a href="#">Logged in as {{ current_user.nickname }}</a></li>#}
             <li><a href="{{ url_for('logout') }}">Log out</a></li>
             {% else %}
             <li><a href="{{ url_for('oauth_authorize', provider='facebook') }}">Log in with Facebook</a></li>
@@ -64,126 +63,111 @@
     </div>
 
     <div class="container">
-        <h1>Welcome to Ann's Mensa Tracker</h1>
-        <p>Hi!  My Mensa Tracker can send you emails when your favorite dishes show
-            up on the menu in the Mensa.</p>
+      <h1>Welcome to Ann's Mensa Tracker</h1>
+      <p>Hi!  My Mensa Tracker can send you emails when your favorite dishes show
+          up on the menu in the Mensa.</p>
 
-        {% for message in get_flashed_messages() %}
+      {% for message in get_flashed_messages() %}
         <p><b>Alert</b>: {{ message }}</p>
-        {% endfor %}
+      {% endfor %}
 
-
-          {% if current_user.is_authenticated %}
-        <div class="row"><div class="col-sm-12">
-          <div class="text-center saved-searches-header"><span id="saved_searches_table_header">
-              You will get alerts for dishes that match the following search terms:</span></div>
-          <div id="saved_searches_table_container">
-        <table class="table table-striped table-vcenter row-border saved-searches"
-                id="saved_searches_table">
-          <thead><tr>
-              <th class="hidden">Search ID</th>
-              <th>Search terms</th>
-              <th></th>
-            </tr></thead>
-          <tbody>
-            {% for search in current_user.searches.all() %}
-              <tr>
-                <td>saved_search_{{ search.id }}</td>
-                <td width="100%">"{{ search.search_terms }}"</td>
-                <td>
-                    <div class="btn-group">
-                    <a href="javascript:setSearchTerms('{{ search.search_terms }}'); runSearch();"
-                        class="btn btn-lg btn-default">Test search</a>
-                    <a href="javascript:deleteSearch({{ search.id }})"
-                       class="btn btn-lg btn-danger">Delete</a>
-                </div>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody></table></div>
-    </div></div>
-    {% endif %}
-
+      {% if current_user.is_authenticated %}
         <div class="row">
-        <div class="col-sm-12">
-            </div></div>
-        <br />
-        <form name="testsearch" action="javascript:runSearch()">
-            <div class="row">
-                <div class="col-sm-8">
-                    <label class="control-label" for="search_terms">
-                        Try searching for a dish or an ingredient you like.</label>
-                    <input type="text" name="search_terms" id="search_terms"
-                       placeholder="e.g. Bolognese, Schafkäse, Vanillesauce" autocomplete="off"
-                       class="form-control"/>
-                </div>
-{#            </div>#}
-            <br/>
-{#            <div class="row">#}
-                <div class="col-sm-4">
-                    <a href="javascript:saveSearch()" class="btn btn-primary btn-lg btn-block"
-                       type="submit">Subscribe to alerts</a>
-                </div>
+          <div class="col-sm-12">
+            <div class="text-center saved-searches-header"><span id="saved_searches_table_header">
+                You will get alerts for dishes that match the following search terms:
+            </span></div>
+
+            <div id="saved_searches_table_container">
+              <table class="table table-striped table-vcenter row-border saved-searches"
+                     id="saved_searches_table">
+                <thead><tr>
+                  <th class="hidden">Search ID</th>
+                  <th>Search terms</th>
+                  <th></th>
+                </tr></thead>
+                <tbody>
+                  {% for search in current_user.searches.all() %}
+                    <tr>
+                      <td>saved_search_{{ search.id }}</td>
+                      <td width="100%">"{{ search.search_terms }}"</td>
+                      <td><div class="btn-group">
+                          <a href="javascript:setSearchTerms('{{ search.search_terms }}'); runSearch();"
+                              class="btn btn-lg btn-default">Test search</a>
+                          <a href="javascript:deleteSearch({{ search.id }})"
+                             class="btn btn-lg btn-danger">Delete</a>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
             </div>
+          </div>
+        </div>
+      {% endif %}
+
+        <br/>
+        <form name="testsearch" action="javascript:runSearch()">
+          <div class="row">
+            <div class="col-sm-12">
+              <label class="control-label" for="search_terms">
+                Try searching for a dish or an ingredient you like.</label>
+              <input type="text" name="search_terms" id="search_terms"
+                     placeholder="e.g. Bolognese, Schafkäse, Vanillesauce"
+                     autocomplete="off" class="form-control"/>
+            </div>
+            <br/>
+          </div>
         </form>
         <br/>
 
-      <div class="row">
-        <div class="col-sm-12">
-          <span id="search_results_placeholder">
-          </span>
-          <div id="search_results_table_container">
+        <span id="search_results_placeholder"></span>
+        <div id="search_results_table_container">
+          <div class="row">
+            <div class="col-sm-12">
               <div class="text-center"><h4><span id="search_results_table_header">Search results</span></h4></div>
-          <table id="search_results_table" class="table table-striped">
-            <thead><tr>
-                <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Date</th>
-                <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Mensa</th>
-                <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Category</th>
-                <th class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Item description</th>
-            </tr></thead>
-            <tbody>
-            </tbody>
-          </table></div>
+              <table id="search_results_table" class="table table-striped">
+                <thead><tr>
+                  <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Date</th>
+                  <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Mensa</th>
+                  <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Category</th>
+                  <th class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Item description</th>
+                </tr></thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
           </div>
+
+          <br/>
+
+          <div class="row">
+            <div class="col-sm-12">
+              <a href="javascript:saveSearch()" class="btn btn-primary btn-lg btn-block">
+                Subscribe to alerts for this search</a>
+            </div>
           </div>
-{#    <div class="row"><div class="col-sm-12">#}
-{#        <div class="text-center">#}
-{#              <h4><br/>Not sure what to search for?  <br/>#}
-{#              Here are some examples for you to try: </h4></div>#}
-{#          <table class="table table-striped table-vcenter row-border saved-searches">#}
-{#              <thead></thead>#}
-{#          <tbody>#}
-{#              <tr><td width="100%">"Bolognese"</td>#}
-{#              <td class="text-center"><form action="javascript:setSearchTerms('Bolognese'); runSearch();">#}
-{#                    <button class="btn btn-lg btn-default" type="submit" value="Test search">Test search</button>#}
-{#              </form></td></tr>#}
-{#              <tr><td width="100%">"Schafkäse"</td>#}
-{#              <td class="text-center"><form action="javascript:setSearchTerms('Schafkäse'); runSearch();">#}
-{#                    <button class="btn btn-lg btn-default" type="submit" value="Test search">Test search</button>#}
-{#                </form></td></tr>#}
-{##}
-{#          </tbody></table>#}
-{#    </div></div>#}
+        </div>
+
+        <br/>
+
         <div class="row"><div class="col-sm-12">
           {% if current_user.is_authenticated %}
               You're logged in as {{ current_user.nickname }}.
               <p>
                 {% if current_user.email == None %}
-                If you would like to receive email alerts,
-                <a href="{{ url_for('oauth_rerequest_permissions') }}">grant us permission here.</a>
-              {% else %}
-                You're signed up to get email alerts at {{ current_user.email }}.
-                <a href="{{ url_for('delete_email_address') }}">To unsubscribe, click here.</a>
-              {% endif %}
+                    If you would like to receive email alerts,
+                    <a href="{{ url_for('oauth_rerequest_permissions') }}">grant us permission here.</a>
+                {% else %}
+                    You're signed up to get email alerts at {{ current_user.email }}.
+                    <a href="{{ url_for('delete_email_address') }}">To unsubscribe, click here.</a>
+                {% endif %}
               </p>
-
           {% endif %}
         </div></div>
-{#          <p><a href="{{ url_for('oauth_authorize', provider='facebook') }}">Login with Facebook</a></p>#}
     </div>
-
-
-
 
 
     <!-- Bootstrap core JavaScript
@@ -219,15 +203,16 @@
                   hideSearchResultsTable();  // Hide the table by default
               },
               "drawCallback": function() {
+                  // Hide pagination controls unless there is more than one page
                   var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
                   pagination.toggle(this.api().page.info().pages > 1);
               },
               "language": {
-                  "emptyTable": "No search results found.", // Hide "No data available in table"
-                  "info": "_START_ to _END_ of _TOTAL_ results"
+                  "emptyTable": "No search results found.",
+                  "info": "_START_ to _END_ of _TOTAL_ results",
+                  "infoEmpty": ""  // Hide "0 to 0 of 0 results"
               }
           });
-
 
           saved_searches_datatable = $('#saved_searches_table').DataTable( {
               "info": false,
@@ -262,7 +247,7 @@
                         return rowData[0] == ("saved_search_" + results['search_id']);
                     }).remove().draw(false);
 
-                    // If we just deleted the last row in the table, don't show the table any more.
+                    // If there are no more saved searches to show, don't show the table any more.
                     if (saved_searches_datatable.rows().count() == 0) {
                         hideSavedSearches();
                     }
@@ -290,8 +275,6 @@
                         "saved_search_" + results['search_id'],
                         '"' + terms + '"',
                         buttons_for_search(terms, results['search_id'])
-{#                        html_delete_button(results['search_id'])#}
-{#                        + html_test_search_button(terms)#}
                     ]).draw(false);
                     showSavedSearches();
 
@@ -301,7 +284,7 @@
                      alert("Received unknown status from server: " + status);
                  }
              }).fail(function(error) {
-                 alert("Error: Search not saved?");
+                 alert("Error communicating with the server.  Try refreshing the page.");
              })
          }
 
