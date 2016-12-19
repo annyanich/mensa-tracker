@@ -25,7 +25,7 @@ class OAuthSignIn(object):
         like giving us access to their email address."""
         pass
 
-    def callback_authorize(self):
+    def callback_authorize(self, search_terms_to_save):
         """Handles the callback when the provider redirects back to our app
         post-authentication.
         :return A four-tuple: Social ID, Nickname, Email address, Permissions granted"""
@@ -43,9 +43,14 @@ class OAuthSignIn(object):
         :return True if successful, False otherwise"""
         pass
 
-    def get_callback_url_for_authorize(self):
-        return url_for('oauth_callback_authorize', provider=self.provider_name,
-                       _external=True)
+    def get_callback_url_for_authorize(self, search_terms_to_save):
+        if search_terms_to_save:
+            return url_for('oauth_callback_authorize', provider=self.provider_name,
+                           search_terms_to_save=search_terms_to_save,
+                           _external=True)
+        else:
+            return url_for('oauth_callback_authorize', provider=self.provider_name,
+                           _external=True)
 
     def get_callback_url_for_rerequest_permissions(self):
         return url_for('oauth_callback_rerequest_permissions', provider=self.provider_name,
@@ -88,7 +93,9 @@ class FacebookSignIn(OAuthSignIn):
         return redirect(self.service.get_authorize_url(
             scope='email',  # Ask Facebook for user's email address
             response_type='code',  # Indicates we are a web app
-            redirect_uri=self.get_callback_url_for_authorize()
+            redirect_uri=self.get_callback_url_for_authorize(
+                request.args.get('search_terms_to_save','')
+            )
         ))
 
     def rerequest_permissions(self):
@@ -99,8 +106,8 @@ class FacebookSignIn(OAuthSignIn):
             auth_type='rerequest'
         ))
 
-    def callback_authorize(self):
-        return self.callback(self.get_callback_url_for_authorize())
+    def callback_authorize(self, search_terms_to_save):
+        return self.callback(self.get_callback_url_for_authorize(search_terms_to_save))
 
     def callback_rerequest_permissions(self):
         return self.callback(self.get_callback_url_for_rerequest_permissions())

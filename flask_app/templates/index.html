@@ -152,8 +152,14 @@
 
           <div class="row">
             <div class="col-sm-12">
-              <a href="javascript:saveSearch()" class="btn btn-primary btn-lg btn-block">
+              {% if current_user.is_authenticated %}
+              <a href="javascript:saveSearchFromForm()" class="btn btn-primary btn-lg btn-block">
                 Subscribe to alerts for this search</a>
+              {% else %}
+              <a href="javascript:redirectToFacebook()"
+                 class="btn btn-primary btn-lg btn-block">
+                Log in with Facebook to receive alerts</a>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -246,10 +252,21 @@
               }
           });
 
+          // If the page is called with /?search_terms=Spinat, then this will
+          // automatically save that search.  This is useful for our login flow,
+          // in which we have Facebook redirect a user back to this URL
+          // after logging in.
+           {% if search_terms_url_param %}
+               saveSearch("{{ search_terms_url_param }}");
+               window.history.replaceState({}, "", "/")  // Change URL in address bar
+           {% endif %}
+
           if (saved_searches_datatable.rows().count() == 0) {
               hideSavedSearches();
           }
-         } );
+
+
+         } );  // End $('document').ready()
 
          function deleteSearch(search_id) {
             jQuery.post('/savedsearches/' + search_id + '/delete', {
@@ -274,23 +291,23 @@
             })
          }
 
-         function saveSearch() {
-             var terms = getSearchTerms().trim();
-             if (terms == "") {
+         function saveSearch(search_terms) {
+             if (search_terms == "") {
                  alert("Please enter some search terms.");
                  return;
              }
 
              jQuery.post('/add_search', {
-                 search_terms: terms
+                 search_terms: search_terms
              }).done(function(results) {
                  if (results['status'] == 'success') {
                     saved_searches_datatable.row.add([
                         "saved_search_" + results['search_id'],
-                        '"' + terms + '"',
-                        buttons_for_search(terms, results['search_id'])
+                        '"' + search_terms + '"',
+                        buttons_for_search(search_terms, results['search_id'])
                     ]).draw(false);
                     showSavedSearches();
+                    scroll_to_div($('#saved_searches_table_header'))
 
                  } else if (results['status'] == 'failed') {
                      alert(results['reason']);
@@ -300,6 +317,10 @@
              }).fail(function(error) {
                  alert("Error communicating with the server.  Try refreshing the page.");
              })
+         }
+
+         function saveSearchFromForm() {
+             saveSearch(getSearchTerms().trim());
          }
 
 
@@ -321,15 +342,19 @@
                         data['category'],
                         data['description']
                     ])
-                })
+                });
                 table.draw(false);
                 showSearchResults();
             }).fail(function(error) {
                 document.getElementById('search_results_placeholder').textContent =
                     "We seem to be having trouble running your search.  " +
                     "Try refreshing the page.";
-            })
+            });
             scroll_to_div($('#search-box'));
+        }
+
+        function redirectToFacebook() {
+             window.location.href = "{{ url_for('oauth_authorize', provider='facebook') }}&search_terms_to_save=" + getSearchTerms();
         }
 
          function hideSavedSearches() {
@@ -383,7 +408,7 @@
             clearTimeout(timer);
             timer = setTimeout(callback, ms);
           };
-        };
+        }
 
         {#   Only run the search after the user stops typing for 500 ms.
              This prevents excessive server load.  #}

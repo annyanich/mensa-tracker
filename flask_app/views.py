@@ -33,7 +33,7 @@ def load_user(user_id):
 
 @app.route('/index')
 def index_test():
-    return render_template('index_test.html')
+    return redirect(url_for('index', search_terms_to_save="Spinatttt"))
 
 
 @app.route('/test_search', methods=['POST'])
@@ -57,9 +57,18 @@ def mensa_history():
     menu_entries = MenuEntry.query.order_by(MenuEntry.date_valid)
     return render_template('mensahistory.html', menu_entries=menu_entries)
 
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # Allow passing search terms in the URL,
+    # This makes our login flow nicer, since a user can click "subscribe to
+    # this search", be prompted to log in, and then be redirected back here to
+    # have their search terms finally get saved.
+    search_terms = request.args.get('search_terms_to_save', '')
+    # Allow only letters and spaces!! Prevent XSS attacks!
+    safe_search_terms = re.sub(r'[^a-zA-Z\s]*', '', search_terms)
+    return render_template('index.html', search_terms_url_param=safe_search_terms)
+
 
 @app.route('/about')
 def about():
@@ -108,7 +117,8 @@ def oauth_callback_authorize():
         return redirect(url_for('index'))
 
     oauth = OAuthSignIn.get_provider('facebook')
-    social_id, username, email, is_email_granted = oauth.callback_authorize()
+    search_terms = request.args.get('search_terms_to_save', '')
+    social_id, username, email, is_email_granted = oauth.callback_authorize(search_terms)
     if social_id is None:
         flash('Authentication failed.')
         return redirect(url_for('index'))
@@ -143,7 +153,8 @@ def oauth_callback_authorize():
                 db.session.rollback()
 
     login_user(user, True)
-    return redirect(url_for('index'))
+
+    return redirect(url_for('index', search_terms_to_save=search_terms))
 
 
 @app.route('/callback/rerequest_permissions/facebook')
