@@ -7,3 +7,6 @@ table.saved-searches tbody td {
     /* Prevents our button group from getting split up by line wrapping */
     display: flex;
 }
+.hide-by-default {
+    display: none;
+}

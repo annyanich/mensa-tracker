@@ -51,7 +51,14 @@
             <li class="active"><a href="#">Home</a></li>
             <li><a href="{{ url_for('mensa_history') }}">Menu Data</a></li>
             <li><a href="{{ url_for('about') }}">About</a></li>
-            <li><a href="mailto:ann.yanich@gmail.com">Contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                Connect with us <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="http://eepurl.com/ct1h-P">Ann's Mensa Tracker mailing list</a></li>
+                <li><a href="mailto:mensa.tracker@gmail.com">Email Ann</a></li>
+              </ul>
+            </li>
             {% if current_user.is_authenticated %}
             <li><a href="{{ url_for('logout') }}">Log out</a></li>
             {% else %}
@@ -110,7 +117,7 @@
 
         <br/>
         <form name="testsearch" action="javascript:runSearch()">
-          <div class="row">
+          <div class="row" id="search-box">
             <div class="col-sm-12">
               <label class="control-label" for="search_terms">
                 Try searching for a dish or an ingredient you like.</label>
@@ -124,10 +131,10 @@
         <br/>
 
         <span id="search_results_placeholder"></span>
-        <div id="search_results_table_container">
+        <div id="search_results_container" class="hide-by-default" >
           <div class="row">
             <div class="col-sm-12">
-              <div class="text-center"><h4><span id="search_results_table_header">Search results</span></h4></div>
+              <div class="text-center"><h4><span id="search_results_header">Search results</span></h4></div>
               <table id="search_results_table" class="table table-striped">
                 <thead><tr>
                   <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Date</th>
@@ -161,13 +168,20 @@
                     If you would like to receive email alerts,
                     <a href="{{ url_for('oauth_rerequest_permissions') }}">grant us permission here.</a>
                 {% else %}
-                    You're signed up to get email alerts at {{ current_user.email }}.
-                    <a href="{{ url_for('delete_email_address') }}">To unsubscribe, click here.</a>
+                    You will get email alerts at {{ current_user.email }}.
+                    <a href="{{ url_for('delete_email_address') }}">Click here to unsubscribe.</a>
                 {% endif %}
               </p>
           {% endif %}
         </div></div>
     </div>
+
+    <footer class="container">
+    <hr>
+    <p>Ann's Mensa Tracker is a new service with lots of room for improvement.
+      Please send your thoughts, ideas, and bug reports to
+      <a href="mailto:mensa.tracker@gmail.com">mensa.tracker@gmail.com</a>.</p>
+ </footer>
 
 
     <!-- Bootstrap core JavaScript
@@ -200,7 +214,7 @@
               "pageLength": 5,
               "lengthChange": false,
               "fnInitComplete": function() {
-                  hideSearchResultsTable();  // Hide the table by default
+                  hideSearchResults();  // Hide the table by default
               },
               "drawCallback": function() {
                   // Hide pagination controls unless there is more than one page
@@ -309,12 +323,13 @@
                     ])
                 })
                 table.draw(false);
-                showSearchResultsTable();
+                showSearchResults();
             }).fail(function(error) {
                 document.getElementById('search_results_placeholder').textContent =
                     "We seem to be having trouble running your search.  " +
                     "Try refreshing the page.";
             })
+            scroll_to_div($('#search-box'));
         }
 
          function hideSavedSearches() {
@@ -327,15 +342,20 @@
              $('#saved_searches_table_container').show()
          }
 
-         function hideSearchResultsTable() {
-             $('#search_results_table_container').hide();
+         function hideSearchResults() {
+             $('#search_results_container').hide();
          }
 
-         function showSearchResultsTable() {
-             $('#search_results_table_header').text("Search results for \"" + getSearchTerms() + "\"");
-             $('#search_results_table_container').show();
+         function showSearchResults() {
+             $('#search_results_header').text("Search results for \"" + getSearchTerms() + "\"");
+             $('#search_results_container').show();
          }
 
+         function scroll_to_div(div) {
+            $('html, body').animate({
+              scrollTop: div.offset().top
+            },1000);
+          }
 
 
          function getSearchTerms() {
