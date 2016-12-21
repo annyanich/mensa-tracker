@@ -31,18 +31,16 @@ def json_failed(reason):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.route('/index')
-def index_test():
-    return redirect(url_for('index', search_terms_to_save="Spinatttt"))
-
 
 @app.route('/test_search', methods=['POST'])
 def test_search():
+    """
+    :param 'search_terms' (HTTP form parameter)
+    :return: The most recent 25 menu entries matching the given search terms.
+    """
     matches = [menu_entry for menu_entry in MenuEntry.query.all()
                if menu_entry.does_search_match(request.form['search_terms'])]
     matches.sort(key=lambda entry: entry.date_valid, reverse=True)
-    # TODO figure out why this appears to only sort based on the day of the month,
-    # so that November 30 comes before December 29 (because 30 > 29 presumably)
 
     result_dict = {'result %s' % entry.id:
                     {'date_valid': entry.date_valid.strftime("%d.%m.%Y"),
@@ -51,6 +49,7 @@ def test_search():
                      'category': entry.category} for entry in matches[:25]}
 
     return jsonify(result_dict)
+
 
 @app.route('/mensa-history')
 def mensa_history():
@@ -66,7 +65,7 @@ def index():
     # have their search terms finally get saved.
     search_terms = request.args.get('search_terms_to_save', '')
     # Allow only letters and spaces!! Prevent XSS attacks!
-    safe_search_terms = re.sub(r'[^a-zA-Z\s]*', '', search_terms)
+    safe_search_terms = re.sub(r'[^a-zA-ZäëöüßÄËÖÜ\s]*', '', search_terms)
     return render_template('index.html', search_terms_url_param=safe_search_terms)
 
 
@@ -74,10 +73,12 @@ def index():
 def about():
     return render_template('about.html')
 
+
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
 
 # @app.route('/authorize/<provider>')
 @app.route('/authorize/facebook')

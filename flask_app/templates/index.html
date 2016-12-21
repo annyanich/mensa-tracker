@@ -258,8 +258,9 @@
           // after logging in.
            {% if search_terms_url_param %}
                saveSearch("{{ search_terms_url_param }}");
-               window.history.replaceState({}, "", "/")  // Change URL in address bar
            {% endif %}
+
+           window.history.replaceState({}, "", "/");  // Clean up URL in address bar
 
           if (saved_searches_datatable.rows().count() == 0) {
               hideSavedSearches();
