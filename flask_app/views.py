@@ -12,57 +12,15 @@ import datetime
 import re
 
 
-# @app.before_request
-# def before_request():
-#     """Force all requests to use https"""
-#     if request.url.startswith('http://'):
-#         url = request.url.replace('http://', 'https://', 1)
-#         code = 301
-#         return redirect(url, code=code)
-
-def json_failed(reason):
-    return jsonify({
-        "status": "failed",
-        "reason": reason
-    })
-
-
 @lm.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-@app.route('/test_search', methods=['POST'])
-def test_search():
-    """
-    :param 'search_terms' (HTTP form parameter)
-    :return: The most recent 25 menu entries matching the given search terms.
-    """
-    matches = [menu_entry for menu_entry in MenuEntry.query.all()
-               if menu_entry.does_search_match(request.form['search_terms'])]
-    matches.sort(key=lambda entry: entry.date_valid, reverse=True)
-
-    result_dict = {'result %s' % entry.id:
-                    {'date_valid': entry.date_valid.strftime("%d.%m.%Y"),
-                     'mensa': entry.mensa,
-                     'description': entry.description,
-                     'category': entry.category} for entry in matches[:25]}
-
-    return jsonify(result_dict)
-
-
-@app.route('/mensa-history')
-def mensa_history():
-    menu_entries = MenuEntry.query.order_by(MenuEntry.date_valid)
-    return render_template('mensahistory.html', menu_entries=menu_entries)
-
-
 @app.route('/')
 def index():
-    # Allow passing search terms in the URL,
-    # This makes our login flow nicer, since a user can click "subscribe to
-    # this search", be prompted to log in, and then be redirected back here to
-    # have their search terms finally get saved.
+    # When an anonymous user tries to subscribe to a search, we pass their
+    # search terms through Facebook as URL parameters in our redirect URL.
     search_terms = request.args.get('search_terms_to_save', '')
     # Allow only letters and spaces!! Prevent XSS attacks!
     safe_search_terms = re.sub(r'[^a-zA-ZäëöüßÄËÖÜ\s]*', '', search_terms)
@@ -72,6 +30,12 @@ def index():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+
+@app.route('/mensa-history')
+def mensa_history():
+    menu_entries = MenuEntry.query.order_by(MenuEntry.date_valid)
+    return render_template('mensahistory.html', menu_entries=menu_entries)
 
 
 @app.route('/logout')
@@ -86,13 +50,8 @@ def oauth_authorize():
     """Invoked when the user clicks the "login with..." button."""
     if not current_user.is_anonymous:
         return redirect(url_for('index'))
+    # TODO allow logging in through Twitter, or another service other than FB
     oauth = OAuthSignIn.get_provider('facebook')
-    # Intentionally left out support for multiple OAuth providers
-    # try:
-    #     oauth = OAuthSignIn.get_provider(provider)
-    # except KeyError:
-    #     flash('Invalid oauth provider')
-    #     return redirect(url_for('index'))
     assert(isinstance(oauth, FacebookSignIn))
 
     return oauth.authorize()
@@ -101,9 +60,9 @@ def oauth_authorize():
 @app.route('/rerequest_permissions/facebook')
 def oauth_rerequest_permissions():
     """
-    Accessible via a link when the user has failed to grant us permission to access their email address.
+    Lets the user grant us permission to access their email address, should they
+    have denied us permission the first time around.
     Sends them to Facebook's OAuth permissions dialog.
-    If they already have given us permission, then this just bounces them back to the main page.
     """
     if current_user.is_anonymous:
         flash('You need to be logged in to do that.')
@@ -134,24 +93,12 @@ def oauth_callback_authorize():
             flash('Something went wrong while adding you as a user.  Sorry!')
             #  TODO log this
             return redirect(url_for('index'))
-    else:  # Update email and nickname to those provided by Facebook.
-        # This way, email and name changes are reflected in our interface upon login.
+    else:
+        # Update email and nickname upon login to those provided by Facebook.
         if email and email != user.email:
-            try:
-                user.email = email
-                db.session.commit()
-            except exc.SQLAlchemyError:
-                flash('Something went wrong while saving your email to our database.')
-                #  TODO log this.
-                db.session.rollback()
+            update_email_address(email)
         if username and username != user.nickname:
-            try:
-                user.nickname = username
-                db.session.commit()
-            except exc.SQLAlchemyError:
-                #  TODO log this
-                flash('Something went wrong while saving your name to our database.')
-                db.session.rollback()
+            update_nickname(username)
 
     login_user(user, True)
 
@@ -174,24 +121,31 @@ def oauth_callback_rerequest_permissions():
         return redirect(url_for('index'))
 
     if email and email != current_user.email:
-        try:
-            current_user.email = email
-            db.session.commit()
-        except exc.SQLAlchemyError:
-            #  TODO log this
-            flash('Something went wrong while saving your email to our database.')
-            db.session.rollback()
+        update_email_address(email)
     if username and username != current_user.nickname:
-        try:
-            current_user.nickname = username
-            db.session.commit()
-        except exc.SQLAlchemyError:
-            #  TODO log this
-            flash('Something went wrong while saving your name to our database.')
-            db.session.rollback()
+        update_nickname(username)
 
     flash('Email permissions granted.  Thanks!  :)')
     return redirect(url_for('index'))
+
+
+@app.route('/test_search', methods=['POST'])
+def test_search():
+    """
+    :param 'search_terms' (HTTP form parameter)
+    :return: The most recent 25 menu entries matching the given search terms.
+    """
+    matches = [menu_entry for menu_entry in MenuEntry.query.all()
+               if menu_entry.does_search_match(request.form['search_terms'])]
+    matches.sort(key=lambda entry: entry.date_valid, reverse=True)
+
+    result_dict = {'result %s' % entry.id:
+                    {'date_valid': entry.date_valid.strftime("%d.%m.%Y"),
+                     'mensa': entry.mensa,
+                     'description': entry.description,
+                     'category': entry.category} for entry in matches[:25]}
+
+    return jsonify(result_dict)
 
 
 @app.route('/add_search', methods=['POST'])
@@ -271,7 +225,8 @@ def delete_email_address():
         db.session.rollback()
 
     oauth = OAuthSignIn.get_provider('facebook')
-    user_id = re.findall('\d+', current_user.social_id)[0]  # Strip out the 'facebook$' at the start of the id
+    # Strip out the 'facebook$' at the start of the id
+    user_id = re.findall('\d+', current_user.social_id)[0]
     permission_revoked = oauth.revoke_email_permission(user_id)
 
     if not permission_revoked:
@@ -280,3 +235,31 @@ def delete_email_address():
               'To permanently remove it, please use your privacy settings in Facebook.')
 
     return redirect(url_for('index'))
+
+
+def json_failed(reason):
+    return jsonify({
+        "status": "failed",
+        "reason": reason
+    })
+
+
+def update_email_address(email):
+    try:
+        current_user.email = email
+        db.session.commit()
+    except exc.SQLAlchemyError:
+        #  TODO log this
+        flash('Something went wrong while saving your email to our database.')
+        db.session.rollback()
+
+
+def update_nickname(nickname):
+    try:
+        current_user.nickname = nickname
+        db.session.commit()
+    except exc.SQLAlchemyError:
+        #  TODO log this
+        flash('Something went wrong while saving your name to our database.')
+        db.session.rollback()
+

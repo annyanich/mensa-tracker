@@ -14,25 +14,12 @@ Ann Yanich (http://mensa-tracker.herokuapp.com)
 EMAIL_SUBJECT_TEMPLATE = "Mensa tracker alert for {date}"
 
 
-def menu_entries_today():
-    return MenuEntry.query.filter_by(date_valid=datetime.date.today()).all()
-
-
-def does_search_match(search_terms, body):
-    def normalize_caseless(text):
-        return unicodedata.normalize("NFKD", text.casefold())
-    return normalize_caseless(search_terms) in normalize_caseless(body)
-
-
-def menu_entry_to_text(entry):
-    return ("{date_valid}\n"
-            "{mensa}: {category}\n"
-            "{description}").format(
-        description=entry.description.replace("\n", " "),
-        mensa=entry.mensa,
-        category=entry.category,
-        date_valid=entry.date_valid.strftime("%A, %d.%m.%Y")
-    )
+def test_email_generation():
+    # TODO convert this into a unit test
+    for recipient, subject, body in email_alerts_for_today():
+        print("Recipient: {0}\n"
+              "Subject: {1}\n"
+              "Body: {2}\n".format(recipient, subject, body))
 
 
 def email_alerts_for_today():
@@ -68,9 +55,22 @@ def email_alerts_for_today():
         yield (user.email, email_subject, email_body)
 
 
-def test_email_generation():
-    for recipient, subject, body in email_alerts_for_today():
-        print("Recipient: {0}\n"
-              "Subject: {1}\n"
-              "Body: {2}\n".format(recipient, subject, body))
+def menu_entries_today():
+    return MenuEntry.query.filter_by(date_valid=datetime.date.today()).all()
 
+
+def does_search_match(search_terms, body):
+    def normalize_caseless(text):
+        return unicodedata.normalize("NFKD", text.casefold())
+    return normalize_caseless(search_terms) in normalize_caseless(body)
+
+
+def menu_entry_to_text(entry):
+    return ("{date_valid}\n"
+            "{mensa}: {category}\n"
+            "{description}").format(
+        description=entry.description.replace("\n", " "),
+        mensa=entry.mensa,
+        category=entry.category,
+        date_valid=entry.date_valid.strftime("%A, %d.%m.%Y")
+    )

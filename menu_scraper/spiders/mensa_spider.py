@@ -21,7 +21,3 @@ class MensaSpider(scrapy.Spider):
         items = get_all_menu_items(soup)
         # Filter out empty items
         return [item for item in items if item['description']]
-
-        # filename = response.url.split("/")[-1]
-        # with open(filename, 'wb') as f:
-        #     f.write(response.body)

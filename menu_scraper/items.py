@@ -11,7 +11,8 @@ import scrapy
 class MenuEntry(scrapy.Item):
     """
     Analogous to a row in the database table 'menu_entries'.
-    TODO Resolve confusion between app.models.MenuEntry and this class.
+    Be careful not to confuse this with app.models.MenuEntry.
+    TODO: rename it to MenuEntryItem?
     """
     date_valid = scrapy.Field()
     description = scrapy.Field()
