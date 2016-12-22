@@ -12,6 +12,7 @@ class MenuEntry(db.Model):
     mensa = db.Column(db.String(64), nullable=False)
     category = db.Column(db.String(64), nullable=False)
     description = db.Column(db.String(500), nullable=False)
+    allergens = db.Column(db.String(64), nullable=False)
     __table_args__ = (UniqueConstraint('date_valid', 'mensa', 'category',
                                        'description',
                                        name="unique_menu_entry_date_mensa_category_description"),
@@ -19,18 +20,23 @@ class MenuEntry(db.Model):
 
     def __repr__(self):
         return '<MenuEntry scraped: {0} valid: {1} Mensa: {2} Category: {3} ' \
-               'Description: {4}'.format(self.time_scraped, self.date_valid,
-                                         self.mensa,
-                                         self.category, self.description)
+               'Description: {4} Allergens: {5}'.format(self.time_scraped,
+                                                        self.date_valid,
+                                                        self.mensa,
+                                                        self.category,
+                                                        self.description,
+                                                        self.allergens)
 
     def to_pretty_text(self):
         return ("{date_valid}\n"
                 "{mensa}: {category}\n"
-                "{description}").format(
+                "{description}"
+                "Allergens: {allergens}").format(
             description=self.description.replace("\n", " "),
             mensa=self.mensa,
             category=self.category,
-            date_valid=self.date_valid.strftime("%A, %d.%m.%Y")
+            date_valid=self.date_valid.strftime("%A, %d.%m.%Y"),
+            allergens=self.allergens
         )
 
     def does_search_match(self, search_terms):

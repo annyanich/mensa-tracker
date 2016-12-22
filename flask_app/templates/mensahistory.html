@@ -11,19 +11,21 @@
 
     <table id="menu_entries" class="table table-striped">
         <thead><tr>
-            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Date</th>
-            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Mensa</th>
-            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Category</th>
-            <th class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Item description</th>
+            <th class="col-sm-2">Date</th>
+            <th class="col-sm-2">Mensa</th>
+            <th class="col-sm-2">Category</th>
+            <th class="col-sm-4">Item description</th>
+            <th class="col-sm-2">Allergens</th>
         </tr></thead>
         <tbody>
         <!--menu_entries is passed into the template as an argument in views.py-->
         {% for item in menu_entries %}
         <tr>
-            <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">{{ item.date_valid }}</td>
-            <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">{{ item.mensa }}</td>
-            <td class="col-lg-2 col-md-2 col-sm-2 col-xs-2">{{ item.category }}</td>
-            <td class="col-lg-8 col-md-8 col-sm-6 col-xs-6">{{ item.description }}</td>
+            <td class="col-sm-2">{{ item.date_valid }}</td>
+            <td class="col-sm-2">{{ item.mensa }}</td>
+            <td class="col-sm-2">{{ item.category }}</td>
+            <td class="col-sm-4">{{ item.description }}</td>
+            <td class="col-sm-2">{{ item.allergens }}</td>
         </tr>
         {% endfor %}
     </tbody></table>

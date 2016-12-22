@@ -30,63 +30,49 @@ def parse_table(menu_table):
     """
     Parse an HTML table used to display a mensa's weekly menu.
     Transform each entry on the menu into a MenuEntry describing the
-    dish's name, category, price, and when and where it is being offered.
+    dish's name, allergens, category, and when and where it is being offered.
 
-    Currently, this function lumps together all the items in each category.
-    For example, there is only one "Pasta" MenuEntry per day, and it
-    represents all of the pastas and sauces on offer for that day.
     :param menu_table: An HTML table object extracted by BeautifulSoup.
     :return A list of MenuEntry Items describing all the dishes offered in
     the menu.
     """
-    # Convert the table into a 2D array.
-    # The first entry of each row will be a category of dish.  E.g. Alternativ,
-    # Suppe, Dessert, Salat, or Pasta. The following five entries will contain
-    # the names of the dishes offered on the five days of the week.
-    data = []
-    table_body = menu_table.find('tbody')
-    rows = table_body.find_all('tr', recursive=False)
-    for row in rows:
-        cols = row.find_all('td', recursive=False)
-        cols = [ele.text.strip() for ele in cols]
-        data.append(cols)
-
-    # The dates for which the menu is valid are posted right above it.
+    # The date range of the table is posted above it.
     date_range = get_date_range_from_string(menu_table.previous_sibling)
+    assert(len(date_range) == 5)
 
-    # The menu is usually five days long. To be safe, let's make sure of that.
-    date_range_length = len(date_range)
-    if date_range_length != 5:
-        raise TableParsingError("Date range above table is not exactly five "
-                                "days long.  It's {0} days long."
-                                .format(date_range_length))
+    table_body = menu_table.find('tbody')
+    # Each row in the table is a category in the menu.
+    # Skip the first row.  It's just the days of the week.
+    for row in table_body.find_all('tr')[1:]:
+        tds = row.find_all('td')
+        assert(len(tds) == 6)  # 1 for the category name + 5 days of the week
 
-    # Skip the first row of data, because it's just the days of the week.
-    for row in data[1:]:
+        category_name = re.sub('[^a-zA-Z]', '', tds[0].text)
 
-        # Each row is expected to have six items in the following order :
-        # [Category name & price] [monday] [tuesday] [wednesday] [thursday] [friday]
-        if len(row) is not 6:
-            raise TableParsingError("A row of the menu is not exactly six items long."
-                                    "Row: {row}"
-                                    "(Expected format: [Category] [Monday] ... [Friday])"
-                                    .format(row=row))
+        for td, date in zip(tds[1:], date_range):
+            menu_items = td.find_all('div', attrs={'class': 'speise_eintrag'})
+            for menu_item in menu_items:
+                # Each item has its allergens listed after it in parentheses,
+                # e.g. 'Spaghetti (Gl)'
+                # We want to split this into its components:
+                # ['Spaghetti', '(Gl)', '']
+                item_split = re.split("(\(.+?\))", menu_item.text.strip())
+                description = item_split[0].strip().replace("\n", " ")\
+                                                   .replace('Ã¼', 'ü')\
+                                                   .replace('Ã¶', 'ö')\
+                                                   .replace('Ã¤', 'ä')\
+                                                   .replace('ÃŸ', 'ß')
+                # Some items do not have allergens.
+                allergens = item_split[1] if len(item_split) == 3 else ""
 
-        category_string = row[0]
-        category_name = re.sub('[^a-zA-Z]', '', category_string)
-        category_price = price_from_category(category_string)
-
-        for entry, date in zip(row[1:], date_range):
-            entry = entry.replace('Ã¼', 'ü')\
-                .replace('Ã¶', 'ö')\
-                .replace('Ã¤', 'ä')\
-                .replace('ÃŸ', 'ß')  # TODO Can this be fixed a nicer way?
-            yield menu_scraper.items.MenuEntry(
-                # price=category_price,
-                mensa="Uhlhornsweg Ausgabe A",
-                category=category_name,
-                description=entry,
-                date_valid=date)
+                yield menu_scraper.items.MenuEntry(
+                    # price=category_price,
+                    mensa="Uhlhornsweg Ausgabe A",
+                    category=category_name,
+                    description=description,
+                    date_valid=date,
+                    allergens=allergens
+                )
 
 
 def get_date_range_from_string(date_range_string):
