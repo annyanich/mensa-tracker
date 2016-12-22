@@ -84,3 +84,13 @@ if os.environ.get('GMAIL_PASSWORD') is None:
           "Without it, we can't send out email alerts.")
 else:
     GMAIL_PASSWORD = os.environ['GMAIL_PASSWORD']
+
+
+menu_urls_and_names = {
+    "https://www.studentenwerk-oldenburg.de/de/gastronomie/speiseplaene"
+    "/uhlhornsweg-ausgabe-b.html": "Uhlhornsweg Classic",
+    # "http://www.studentenwerk-oldenburg.de/gastronomie/speiseplaene"
+    # "/uhlhornsweg-culinarium.html": "Uhlhornsweg Culinarium",
+    "https://www.studentenwerk-oldenburg.de/de/gastronomie/speiseplaene"
+    "/uhlhornsweg-ausgabe-a.html": "Uhlhornsweg Pasta & Veggie/Vegan"
+}

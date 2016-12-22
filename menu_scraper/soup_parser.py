@@ -4,17 +4,21 @@
 import re
 import datetime
 import menu_scraper.items
+from config import menu_urls_and_names
+from bs4 import BeautifulSoup
 
 
-def get_all_menu_items(soup):
+def get_all_menu_items(response):
     """
     Find all the menus on the web page and break them down into database items.
-    :param soup: A BeautifulSoup object made from an HTML mensa menu page
+    :param response: A Response object from Scrapy.
     :return: An iterator of MenuEntry objects for every menu entry on
     the web page.
     """
+    soup = BeautifulSoup(response.body.decode(response.encoding), "lxml")
     for table in get_menu_tables(soup):
         for entry in parse_table(table):
+            entry['mensa'] = menu_urls_and_names[response.url]
             yield entry
 
 
@@ -47,16 +51,17 @@ def parse_table(menu_table):
         tds = row.find_all('td')
         assert(len(tds) == 6)  # 1 for the category name + 5 days of the week
 
-        category_name = re.sub('[^a-zA-Z]', '', tds[0].text)
+        category_name = re.sub('[^a-zA-ZäüößÄÜÖ]', '', tds[0].text)
 
         for td, date in zip(tds[1:], date_range):
             menu_items = td.find_all('div', attrs={'class': 'speise_eintrag'})
             for menu_item in menu_items:
                 # Each item has its allergens listed after it in parentheses,
-                # e.g. 'Spaghetti (Gl)'
-                # We want to split this into its components:
-                # ['Spaghetti', '(Gl)', '']
+                # e.g. 'Spaghetti (Gl)', 'Eisbergsalat'
+                # We want to split these into their components:
+                # ['Spaghetti', '(Gl)', ''] or ['Eisbergsalat']
                 item_split = re.split("(\(.+?\))", menu_item.text.strip())
+                assert(len(item_split) == 1 or len(item_split) == 3)
                 description = item_split[0].strip().replace("\n", " ")\
                                                    .replace('Ã¼', 'ü')\
                                                    .replace('Ã¶', 'ö')\
@@ -67,7 +72,7 @@ def parse_table(menu_table):
 
                 yield menu_scraper.items.MenuEntry(
                     # price=category_price,
-                    mensa="Uhlhornsweg Ausgabe A",
+                    # mensa="Uhlhornsweg Ausgabe A",
                     category=category_name,
                     description=description,
                     date_valid=date,
