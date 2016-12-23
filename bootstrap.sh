@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Set up German locale
+locale-gen de_DE.utf8
+
 # add heroku repository to apt
 echo "deb http://toolbelt.heroku.com/ubuntu ./" > /etc/apt/sources.list.d/heroku.list
 

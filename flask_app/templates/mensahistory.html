@@ -14,8 +14,9 @@
             <th class="col-sm-2">Date</th>
             <th class="col-sm-2">Mensa</th>
             <th class="col-sm-2">Category</th>
-            <th class="col-sm-4">Item description</th>
+            <th class="col-sm-3">Item description</th>
             <th class="col-sm-2">Allergens</th>
+            <th class="col-sm-1">Price</th>
         </tr></thead>
         <tbody>
         <!--menu_entries is passed into the template as an argument in views.py-->
@@ -26,6 +27,7 @@
             <td class="col-sm-2">{{ item.category }}</td>
             <td class="col-sm-4">{{ item.description }}</td>
             <td class="col-sm-2">{{ item.allergens }}</td>
+            <td class="col-sm-1">{{ currency(item.price/100) }}</td>
         </tr>
         {% endfor %}
     </tbody></table>

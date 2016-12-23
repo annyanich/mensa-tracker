@@ -16,9 +16,11 @@ lm.login_view = 'index'
 
 from flask_app import views, models
 
-# Expose datetime-formatting functions to all templates
+# Expose datetime-formatting and money-formatting functions to all templates
 from flask_app.momentjs import Momentjs
+from locale import currency
 app.jinja_env.globals['Momentjs'] = Momentjs
+app.jinja_env.globals['currency'] = currency
 
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.ERROR)

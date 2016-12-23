@@ -18,7 +18,8 @@ class FilterDuplicates(object):
             mensa=item['mensa'],
             description=item['description'],
             date_valid=item['date_valid'],
-            allergens=item['allergens']
+            allergens=item['allergens'],
+            price=item['price']
         ).all()
 
         if db_matches:
@@ -43,6 +44,7 @@ class SaveToDatabase:
                     date_valid=item['date_valid'],
                     category=item['category'],
                     allergens=item['allergens'],
+                    price=item['price'],
                     time_scraped=spider.crawler.stats.get_stats(spider)['start_time'])
         db.session.add(new_entry)
         db.session.commit()

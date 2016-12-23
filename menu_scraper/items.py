@@ -19,3 +19,4 @@ class MenuEntry(scrapy.Item):
     category = scrapy.Field()
     mensa = scrapy.Field()
     allergens = scrapy.Field()
+    price = scrapy.Field()

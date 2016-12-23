@@ -42,39 +42,54 @@ def parse_table(menu_table):
     """
     # The date range of the table is posted above it.
     date_range = get_date_range_from_string(menu_table.previous_sibling)
-    assert(len(date_range) == 5)
+    assert(len(date_range) == 5, "A menu should be valid for a five-day range.")
 
     table_body = menu_table.find('tbody')
     # Each row in the table is a category in the menu.
     # Skip the first row.  It's just the days of the week.
     for row in table_body.find_all('tr')[1:]:
         tds = row.find_all('td')
-        assert(len(tds) == 6)  # 1 for the category name + 5 days of the week
+        assert(len(tds) == 6, "A row in a menu should be six cells wide."
+                              "1 for the category name + 5 days of the week.")
 
-        category_name = re.sub('[^a-zA-ZäüößÄÜÖ]', '', tds[0].text)
+        category_name = re.sub('[^a-zA-ZäüößÄÜÖ\/]', '', tds[0].text)
+        category_price_match = re.search("[0-9],[0-9][0-9]", tds[0].text)
 
         for td, date in zip(tds[1:], date_range):
-            menu_items = td.find_all('div', attrs={'class': 'speise_eintrag'})
-            for menu_item in menu_items:
+            menu_item_divs = td.find_all('div', attrs={'class': 'speise_eintrag'})
+            for menu_item_div in menu_item_divs:
+                if category_price_match:
+                    price = category_price_match.group(0)
+                else:
+                    item_price_match = re.search("[0-9],[0-9][0-9]", menu_item_div.text)
+                    assert(item_price_match, "There must be a price posted "
+                                             "for each item on the menu.")
+                    price = item_price_match.group(0)
+
                 # Each item has its allergens listed after it in parentheses,
-                # e.g. 'Spaghetti (Gl)', 'Eisbergsalat'
+                # e.g. 'Spaghetti (Gl)', 'Eisbergsalat 0,35'
                 # We want to split these into their components:
-                # ['Spaghetti', '(Gl)', ''] or ['Eisbergsalat']
-                item_split = re.split("(\(.+?\))", menu_item.text.strip())
+                # ['Spaghetti', '(Gl)', ''] or ['Eisbergsalat 0,35']
+                item_split = re.split("(\(.+?\))", menu_item_div.text.strip())
                 assert(len(item_split) == 1 or len(item_split) == 3)
-                description = item_split[0].strip().replace("\n", " ")\
-                                                   .replace('Ã¼', 'ü')\
-                                                   .replace('Ã¶', 'ö')\
-                                                   .replace('Ã¤', 'ä')\
-                                                   .replace('ÃŸ', 'ß')
+
+                # Fix garbled text and remove newlines
+                item_name = item_split[0].replace('Ã¼', 'ü')\
+                                         .replace('Ã¶', 'ö')\
+                                         .replace('Ã¤', 'ä')\
+                                         .replace('ÃŸ', 'ß')\
+                                         .replace("\n", " ")
+
+                # Delete the price out of item_name
+                item_name = re.sub("[0-9],[0-9][0-9]", "", item_name).strip()
+
                 # Some items do not have allergens.
                 allergens = item_split[1] if len(item_split) == 3 else ""
 
                 yield menu_scraper.items.MenuEntry(
-                    # price=category_price,
-                    # mensa="Uhlhornsweg Ausgabe A",
+                    price=int(price.replace(',', '')),
                     category=category_name,
-                    description=description,
+                    description=item_name,
                     date_valid=date,
                     allergens=allergens
                 )
@@ -114,38 +129,5 @@ def get_date_range_from_string(date_range_string):
     return date_range
 
 
-def price_from_category(category_string):
-    """Use a regex to grab the price out of a posted category.
-    :param category_string: The contents of a 'category' box in a mensa menu
-     table, e.g. "Pasta 1,30"
-    :return A price in Euros, expressed as a float. e.g. 1.3
-    """
-    regex_string = "[0-9],[0-9][0-9]"
-    matches = re.findall(regex_string, category_string)
-    number_of_matches = len(matches)
-    if number_of_matches == 1:
-        price = float(matches[0].replace(',', '.'))
-        return price
-    elif number_of_matches == 0:
-        raise PriceParsingError("A price could not be found for the given "
-                                "category ('{1}').  The regex '{0}'"
-                                " did not produce any matches."
-                                .format(regex_string, category_string))
-    elif number_of_matches > 1:
-        raise PriceParsingError("A price could not be determined for the given "
-                                "category ('{1}'). The regex '{0}' produced "
-                                "more than one match: {2}"
-                                .format(regex_string, category_string, matches))
-
-
 class DateRangeParsingError(ValueError):
     """Indicates a problem parsing the date range posted above a menu."""
-
-
-class PriceParsingError(ValueError):
-    """Used to indicate that something went wrong while parsing the price of a
-    menu item."""
-
-
-class TableParsingError(ValueError):
-    """Indicates something went wrong while parsing a menu table."""

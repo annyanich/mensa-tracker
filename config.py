@@ -3,6 +3,7 @@
 # WTF_CSRF_ENABLED = True
 
 import os
+import locale
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -87,10 +88,16 @@ else:
 
 
 menu_urls_and_names = {
-    "https://www.studentenwerk-oldenburg.de/de/gastronomie/speiseplaene"
-    "/uhlhornsweg-ausgabe-b.html": "Uhlhornsweg Classic",
-    # "http://www.studentenwerk-oldenburg.de/gastronomie/speiseplaene"
+    # "https://www.studentenwerk-oldenburg.de/de/gastronomie/speiseplaene"
+    # "/uhlhornsweg-ausgabe-b.html": "Uhlhornsweg Classic",
+    # "https://www.studentenwerk-oldenburg.de/de/gastronomie/speiseplaene"
     # "/uhlhornsweg-culinarium.html": "Uhlhornsweg Culinarium",
-    "https://www.studentenwerk-oldenburg.de/de/gastronomie/speiseplaene"
-    "/uhlhornsweg-ausgabe-a.html": "Uhlhornsweg Pasta & Veggie/Vegan"
+    # "https://www.studentenwerk-oldenburg.de/de/gastronomie/speiseplaene"
+    # "/uhlhornsweg-ausgabe-a.html": "Uhlhornsweg Pasta & Veggie/Vegan"
+    "file:///vagrant/test%20menu%20pages/uhlhornsweg-culinarium-20161222.html": "Uhlhornsweg Culinarium",
+    "file:///vagrant/test%20menu%20pages/uhlhornsweg-pastaveggievegan-20161222.html": "Uhlhornsweg Pasta & Veggie/Vegan",
+    "file:///vagrant/test%20menu%20pages/wechloy-20161222.html": "Wechloy",
+    "file:///vagrant/test%20menu%20pages/uhlhornsweg-classic-20161222.html": "Uhlhornsweg Classic"
 }
+
+locale.setlocale(locale.LC_MONETARY, 'de_DE.utf8')

@@ -3,6 +3,7 @@ from flask.ext.login import UserMixin
 from sqlalchemy import UniqueConstraint
 
 import unicodedata
+import locale
 
 class MenuEntry(db.Model):
     __tablename__ = 'menu_entries'
@@ -13,6 +14,7 @@ class MenuEntry(db.Model):
     category = db.Column(db.String(64), nullable=False)
     description = db.Column(db.String(500), nullable=False)
     allergens = db.Column(db.String(64), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
     __table_args__ = (UniqueConstraint('date_valid', 'mensa', 'category',
                                        'description',
                                        name="unique_menu_entry_date_mensa_category_description"),
@@ -20,23 +22,27 @@ class MenuEntry(db.Model):
 
     def __repr__(self):
         return '<MenuEntry scraped: {0} valid: {1} Mensa: {2} Category: {3} ' \
-               'Description: {4} Allergens: {5}'.format(self.time_scraped,
-                                                        self.date_valid,
-                                                        self.mensa,
-                                                        self.category,
-                                                        self.description,
-                                                        self.allergens)
+               'Description: {4} Allergens: {5} ' \
+               'Price: {6}'.format(self.time_scraped,
+                                   self.date_valid,
+                                   self.mensa,
+                                   self.category,
+                                   self.description,
+                                   self.allergens,
+                                   locale.currency(self.price/100))
 
     def to_pretty_text(self):
         return ("{date_valid}\n"
                 "{mensa}: {category}\n"
-                "{description}"
-                "Allergens: {allergens}").format(
+                "{description}\n"
+                "Allergens: {allergens}\n"
+                "{price}\n").format(
             description=self.description.replace("\n", " "),
             mensa=self.mensa,
             category=self.category,
             date_valid=self.date_valid.strftime("%A, %d.%m.%Y"),
-            allergens=self.allergens
+            allergens=self.allergens,
+            price=locale.currency(self.price/100)
         )
 
     def does_search_match(self, search_terms):
