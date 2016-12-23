@@ -22,12 +22,13 @@ def get_all_menu_items(response):
             yield entry
 
 
-# The details in the summary attribute always say "Ausgabe B (aktuelle
-# Woche)", even if you're looking at Ausgabe A or nächste Woche.  It's dumb.
-# TODO? change this so it just looks for a substring like 'Wochenplan Uweg'?
 def get_menu_tables(soup):
-    return soup.findAll('table', attrs={
-        'summary': 'Wochenplan Uweg Ausgabe B (aktuelle Woche)'})
+    # The summary attribute for the table with the menu plan says something
+    # like "Wochenplan Uweg Ausgabe B (aktuelle Woche)".
+    def is_menu_table(tag):
+        return tag.name == 'table' and tag.has_attr('summary')\
+            and 'Wochenplan' in tag['summary']
+    return soup.findAll(is_menu_table)
 
 
 def parse_table(menu_table):
