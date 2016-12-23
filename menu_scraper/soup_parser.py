@@ -52,19 +52,15 @@ def parse_table(menu_table):
         assert(len(tds) == 6, "A row in a menu should be six cells wide."
                               "1 for the category name + 5 days of the week.")
 
+        # Contents e.g. "Haupt-\ngericht", "Beilagen\n 0,35", "Veggie/Vegan"
         category_name = re.sub('[^a-zA-ZäüößÄÜÖ\/]', '', tds[0].text)
+
+        # Sometimes a price is posted next to the category name.
         category_price_match = re.search("[0-9],[0-9][0-9]", tds[0].text)
 
         for td, date in zip(tds[1:], date_range):
             menu_item_divs = td.find_all('div', attrs={'class': 'speise_eintrag'})
             for menu_item_div in menu_item_divs:
-                if category_price_match:
-                    price = category_price_match.group(0)
-                else:
-                    item_price_match = re.search("[0-9],[0-9][0-9]", menu_item_div.text)
-                    assert(item_price_match, "There must be a price posted "
-                                             "for each item on the menu.")
-                    price = item_price_match.group(0)
 
                 # Each item has its allergens listed after it in parentheses,
                 # e.g. 'Spaghetti (Gl)', 'Eisbergsalat 0,35'
@@ -73,21 +69,42 @@ def parse_table(menu_table):
                 item_split = re.split("(\(.+?\))", menu_item_div.text.strip())
                 assert(len(item_split) == 1 or len(item_split) == 3)
 
-                # Fix garbled text and remove newlines
-                item_name = item_split[0].replace('Ã¼', 'ü')\
-                                         .replace('Ã¶', 'ö')\
-                                         .replace('Ã¤', 'ä')\
-                                         .replace('ÃŸ', 'ß')\
-                                         .replace("\n", " ")
-
-                # Delete the price out of item_name
-                item_name = re.sub("[0-9],[0-9][0-9]", "", item_name).strip()
-
                 # Some items do not have allergens.
                 allergens = item_split[1] if len(item_split) == 3 else ""
 
+                # Extract the item's name.  First, fix garbled German letters
+                item_name = item_split[0].replace('Ã¼', 'ü')\
+                                         .replace('Ã¶', 'ö')\
+                                         .replace('Ã¤', 'ä')\
+                                         .replace('ÃŸ', 'ß')
+
+                # Remove the price, if present, from the item's name
+                item_name = re.sub("[0-9],[0-9][0-9]", "", item_name)
+
+                # Remove the extra space that is present when a word is
+                # hyphenated and split across two lines
+                item_name = re.sub("-\s*", "-", item_name)
+
+                # Finally, clean up whitespace.
+                # Newlines become spaces.  Trailing whitespace goes away.
+                # Double spaces become single spaces.
+                item_name = ' '.join(item_name.split())
+
+                if category_price_match:
+                    price_string = category_price_match.group(0)
+                else:
+                    # If there's no price next to the category, there's usually
+                    # one posted next to the item itself.
+                    item_price_match = re.search("[0-9],[0-9][0-9]", menu_item_div.text)
+                    if category_name != 'Pastasauce' and item_name != 'Salatbar':
+                        assert(item_price_match,
+                               "We expect to see a price listed for all items,"
+                               "except for Pastasauce and Salatbar.")
+                    price_string = item_price_match.group(0) \
+                        if item_price_match else '0'
+
                 yield menu_scraper.items.MenuEntry(
-                    price=int(price.replace(',', '')),
+                    price=int(price_string.replace(',', '')),
                     category=category_name,
                     description=item_name,
                     date_valid=date,
@@ -97,9 +114,9 @@ def parse_table(menu_table):
 
 def get_date_range_from_string(date_range_string):
     """
-    Parse the 5 day long date range that is usually posted above a menu.
+    Parse the date range that is usually posted above a menu.
     :param date_range_string: E.g. "(31.01.16 - 04.02.16)"
-    :return A list of five datetime.date objects representing the dates the menu
+    :return A list of datetime.date objects representing the dates the menu
     is valid for.
     """
 
