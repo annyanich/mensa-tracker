@@ -43,15 +43,23 @@ def parse_table(menu_table):
     """
     # The date range of the table is posted above it.
     date_range = get_date_range_from_string(menu_table.previous_sibling)
-    assert(len(date_range) == 5, "A menu should be valid for a five-day range.")
+    assert len(date_range) == 5, ("We assume that each menu covers five days, "
+                                  "but this menu has the following date range "
+                                  "posted above it:\n{0}\n"
+                                  "Maybe this assumption is no longer "
+                                  "true.".format(
+                                   "\n".join(str(date) for date in date_range)))
 
     table_body = menu_table.find('tbody')
     # Each row in the table is a category in the menu.
     # Skip the first row.  It's just the days of the week.
-    for row in table_body.find_all('tr')[1:]:
-        tds = row.find_all('td')
-        assert(len(tds) == 6, "A row in a menu should be six cells wide."
-                              "1 for the category name + 5 days of the week.")
+    for row in table_body.find_all('tr', recursive=False)[1:]:
+        tds = row.find_all('td', recursive=False)
+        assert len(tds) == 6, ("A row in the Speisekarte should be six "
+                               "columns wide: One category name plus five "
+                               "days' worth of menu entries. This row is "
+                               "either too wide or not wide enough: \n") + \
+            "\n".join("Column {i}: {text}".format(i=i, text=td.text) for i, td in enumerate(tds))
 
         # Contents e.g. "Haupt-\ngericht", "Beilagen\n 0,35", "Veggie/Vegan"
         category_name = re.sub('[^a-zA-ZäüößÄÜÖ\/]', '', tds[0].text)
@@ -59,18 +67,20 @@ def parse_table(menu_table):
         # Sometimes a price is posted next to the category name.
         category_price_match = re.search("[0-9],[0-9][0-9]", tds[0].text)
 
+        # Iterate through five cells of the menu, corresponding to five days
+        # of the week
         for td, date in zip(tds[1:], date_range):
-            menu_item_divs = td.find_all('div', attrs={'class': 'speise_eintrag'})
+            menu_item_divs = td.find_all(attrs={'class': 'speise_eintrag'})
             for menu_item_div in menu_item_divs:
 
                 # Each item has its allergens listed after it in parentheses,
                 # e.g. 'Spaghetti (Gl)', 'Eisbergsalat 0,35'
                 # We want to split these into their components:
-                # ['Spaghetti', '(Gl)', ''] or ['Eisbergsalat 0,35']
+                # item_split=['Spaghetti', '(Gl)', ''] or ['Eisbergsalat 0,35']
                 item_split = re.split("(\(.+?\))", menu_item_div.text.strip())
-                assert(len(item_split) == 1 or len(item_split) == 3)
+                assert len(item_split) == 1 or len(item_split) == 3
 
-                # Some items do not have allergens.
+                # Extract allergens.  See comment above
                 allergens = item_split[1] if len(item_split) == 3 else ""
 
                 # Extract the item's name.  First, fix garbled German letters
@@ -91,16 +101,20 @@ def parse_table(menu_table):
                 # Double spaces become single spaces.
                 item_name = ' '.join(item_name.split())
 
+                # Get the item's price. If there's no price next to the
+                # category, there's usually one posted next to the item itself.
                 if category_price_match:
                     price_string = category_price_match.group(0)
                 else:
-                    # If there's no price next to the category, there's usually
-                    # one posted next to the item itself.
                     item_price_match = re.search("[0-9],[0-9][0-9]", menu_item_div.text)
                     if category_name != 'Pastasauce' and item_name != 'Salatbar':
-                        assert(item_price_match,
-                               "We expect to see a price listed for all items,"
-                               "except for Pastasauce and Salatbar.")
+                        assert item_price_match, \
+                               ("We expect to see a price listed for every "
+                                "item, except for Pastasauce and Salatbar.  "
+                                "This item does not have a price: \n"
+                                "Name: {name}\nCategory: {cat}\nDate: {date}".format(
+                                   name=item_name, cat=category_name, date=date
+                                ))
                     price_string = item_price_match.group(0) \
                         if item_price_match else '0'
 
@@ -139,7 +153,7 @@ def get_date_range_from_string(date_range_string):
 
     if start_date > end_date:
         raise DateRangeParsingError('The start date came before the end date: '
-                                 '{0}'.format(date_range_string))
+                                    '{0}'.format(date_range_string))
 
     range_length = (end_date - start_date).days + 1
     date_range = [(start_date + datetime.timedelta(days=n))
