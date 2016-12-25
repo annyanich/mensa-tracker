@@ -136,7 +136,10 @@ def test_search():
     :return: The most recent 25 menu entries matching the given search terms.
     """
     matches = [menu_entry for menu_entry in MenuEntry.query.all()
-               if menu_entry.does_search_match(request.form['search_terms'])]
+               if menu_entry.does_search_match(request.form['search_terms'])
+               if menu_entry.mensa in ['Uhlhornsweg Culinarium',
+                                       'Uhlhornsweg Pasta & Veggie/Vegan',
+                                       'Uhlhornsweg Classic']]
     matches.sort(key=lambda entry: entry.date_valid, reverse=True)
 
     result_dict = {'result %s' % entry.id:
