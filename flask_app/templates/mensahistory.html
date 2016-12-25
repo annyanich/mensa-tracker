@@ -26,8 +26,8 @@
             <td class="col-sm-2">{{ item.mensa }}</td>
             <td class="col-sm-2">{{ item.category }}</td>
             <td class="col-sm-4">{{ item.description }}</td>
-            <td class="col-sm-2">{{ item.allergens }}</td>
-            <td class="col-sm-1">{{ currency(item.price/100) }}</td>
+            <td class="col-sm-2">{{ item.allergens if item.allergens }}</td>
+            <td class="col-sm-1">{{ currency(item.price/100) if item.price }}</td>
         </tr>
         {% endfor %}
     </tbody></table>
