@@ -76,7 +76,6 @@ def get_date_range_from_string(date_range_string):
         'Date string: {0}\nRegex: {1}'.format(date_range_string,
                                               date_regex))
 
-    # Convert from strings into datetime.date values
     dates = [datetime.datetime.strptime(string, "%d.%m.%y").date()
              for string in date_strings]
     start_date, end_date = dates[0], dates[1]
@@ -138,7 +137,7 @@ def item_from_string(item_string):
     item_split = re.split("(\(.+?\))", item_string.strip())
     assert len(item_split) == 1 or len(item_split) == 3
 
-    allergens = item_split[1] if len(item_split) == 3 else ""
+    allergens = item_split[1] if len(item_split) == 3 else None
 
     price = get_price_from_string(item_string)
 
