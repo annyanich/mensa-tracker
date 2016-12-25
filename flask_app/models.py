@@ -13,8 +13,8 @@ class MenuEntry(db.Model):
     mensa = db.Column(db.String(64), nullable=False)
     category = db.Column(db.String(64), nullable=False)
     description = db.Column(db.String(500), nullable=False)
-    allergens = db.Column(db.String(64), nullable=False)
-    price = db.Column(db.Integer, nullable=False)
+    allergens = db.Column(db.String(64), nullable=True)
+    price = db.Column(db.Integer, nullable=True)
     __table_args__ = (UniqueConstraint('date_valid', 'mensa', 'category',
                                        'description',
                                        name="unique_menu_entry_date_mensa_category_description"),
