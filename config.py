@@ -7,6 +7,8 @@ import locale
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+locale.setlocale(locale.LC_MONETARY, 'de_DE.utf8')
+
 # Heroku gives us the url of the app's Postgres database via the environment
 # variable 'DATABASE_URL'.
 if os.environ.get('DATABASE_URL') is None:
@@ -107,4 +109,16 @@ menu_urls_and_names = {
     # "file:///vagrant/test%20menu%20pages/elsfleth-20161223.html": "Elsfleth"
 }
 
-locale.setlocale(locale.LC_MONETARY, 'de_DE.utf8')
+
+def we_are_scraping_a_real_website():
+    for url in menu_urls_and_names.keys():
+        if not url.startswith('file:///'):
+            return True
+    return False
+
+SCRAPY_USER_AGENT = 'Anns Mensa Tracker (mensa-tracker.herokuapp.com) (ann.yanich@gmail.com)'
+
+# Scrapy waits this many seconds in between requests to the same website.
+# Please don't change '60' to a lower value.
+# If we send too many requests too fast, the Studentenwerk may get upset.
+SCRAPY_DOWNLOAD_DELAY = 60 if we_are_scraping_a_real_website() else 1

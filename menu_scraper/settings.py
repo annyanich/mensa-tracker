@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from config import SCRAPY_DOWNLOAD_DELAY, SCRAPY_USER_AGENT
+
 # Scrapy settings for menuscraper project
 #
 # For simplicity, this file contains only settings considered important or
@@ -16,7 +18,7 @@ NEWSPIDER_MODULE = 'menu_scraper.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Anns Mensa Tracker (mensa-tracker.herokuapp.com) (ann.yanich@gmail.com)'
+USER_AGENT = SCRAPY_USER_AGENT
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -27,7 +29,7 @@ CONCURRENT_REQUESTS = 1
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 3
+DOWNLOAD_DELAY = SCRAPY_DOWNLOAD_DELAY
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # CONCURRENT_REQUESTS_PER_IP = 16
