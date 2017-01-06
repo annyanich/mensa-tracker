@@ -4,7 +4,7 @@ import datetime
 import unicodedata
 
 EMAIL_BODY_TEMPLATE = """Hi, {name}!
-You've signed up to receive email alerts when certain items appear in the mensa.
+You've signed up to receive email alerts when certain items appear in the Mensa.
 Today, the following items matching your search terms are on the menu:
 
 {search_results}Guten Appetit!

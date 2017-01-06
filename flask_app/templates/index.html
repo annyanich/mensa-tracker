@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
     <h1>Welcome to Ann's Mensa Tracker</h1>
-    <p>Never miss your favorite dishes in the Mensa again.
-      Enter the names of the things you like and get notified via email the night
-      before they appear in the Mensa.
+    <p>Never miss your favorite foods in the Mensa again!
+      Enter their names here, and I will send you an email the night before
+      when they're going to be on the menu.
 
     {% if current_user.is_authenticated %}
       <div class="row">
@@ -82,7 +82,7 @@
           {% else %}
           <a href="javascript:redirectToFacebook()"
              class="btn btn-primary btn-lg btn-block">
-            Log in with Facebook to receive alerts</a>
+            Log in with Facebook to subscribe to alerts for this search</a>
           {% endif %}
         </div>
       </div>
