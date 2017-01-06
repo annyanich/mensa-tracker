@@ -12,7 +12,7 @@
               You will get alerts for dishes that match the following search terms:
           </div>
 
-          <table class="table table-striped table-vcenter row-border saved-searches"
+          <table class="table table-vcenter saved-searches"
                  id="saved_searches_table">
             <thead><tr>
               <th class="hidden">Search ID</th>
@@ -27,9 +27,9 @@
                   <td width="100%">"{{ search.search_terms }}"</td>
                   <td><div class="btn-group">
                       <a href="javascript:setSearchTerms('{{ search.search_terms }}'); runSearch();"
-                          class="btn btn-lg btn-default">Test search</a>
+                          class="btn btn-md btn-default">Test search</a>
                       <a href="javascript:deleteSearch({{ search.id }})"
-                         class="btn btn-lg btn-danger">Delete</a>
+                         class="btn btn-md btn-danger">Delete</a>
                     </div>
                   </td>
                 </tr>
@@ -276,7 +276,7 @@
       }
 
        function hideSavedSearches() {
-           $('#saved_searches_table_header').text("(Your subscriptions will be listed here.)");
+           $('#saved_searches_table_header').text("(Your saved searches will be listed here.)");
            $('#saved_searches_table').hide();
        }
 
@@ -313,9 +313,9 @@
        function buttons_for_search(search_terms, search_id) {
            var html = '<div class="btn-group">';
            html += "<a href=\"javascript:setSearchTerms('" + search_terms + "'); runSearch();\"";
-           html += "class=\"btn btn-lg btn-default\" value=\"Test search\">Test search</a>";
+           html += "class=\"btn btn-md btn-default\" value=\"Test search\">Test search</a>";
            html += "<a href=\"javascript:deleteSearch(" + search_id + ")\"";
-           html += "class=\"btn btn-lg btn-danger\" value=\"Delete\">Delete</a>";
+           html += "class=\"btn btn-md btn-danger\" value=\"Delete\">Delete</a>";
            html += "</div>";
            return html;
        }
