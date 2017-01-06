@@ -17,9 +17,17 @@ def get_all_menu_items(response):
     """
     soup = BeautifulSoup(response.body.decode(response.encoding), "lxml")
     for table in get_menu_tables(soup):
-        for entry in parse_table(table):
-            entry['mensa'] = menu_urls_and_names[response.url]
-            yield entry
+        try: 
+            for entry in parse_table(table):
+                try:
+                    entry['mensa'] = menu_urls_and_names[response.url]
+                    yield entry
+                except MenuParserException as e:
+                    print("Ran into a problem parsing a menu item. "
+                          "Got a MenuParserException: {0}".format(e))
+        except MenuParserException as e:
+            print("Ran into a problem parsing the menus on a page. "
+                  "Got a MenuParserException: {0}".format(e))
 
 
 def get_menu_tables(soup):
@@ -31,7 +39,13 @@ def get_menu_tables(soup):
         return tag.name == 'table' and tag.has_attr('summary')\
             and 'Wochenplan' in tag['summary']
 
-    return soup.findAll(is_menu_table)
+    tables = soup.findAll(is_menu_table)
+    if len(tables) < 1 or len(tables) > 2:
+        raise MenuParserException("An unexpected number of menu tables was "
+                                  "found on the Mensa website: {0} tables. "
+                                  "We normally expect to see two."
+                                  .format(len(tables)))
+    return tables
 
 
 def parse_table(menu_table):
@@ -70,26 +84,29 @@ def get_date_range_from_string(date_range_string):
     """
     date_regex = '[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]'
     date_strings = re.findall(date_regex, date_range_string)
-    assert len(date_strings) == 2, (
-        'The date range string found above a menu does not contain exactly '
-        'two dates as determined by our Regex. \n'
-        'Date string: {0}\nRegex: {1}'.format(date_range_string,
-                                              date_regex))
+    if len(date_strings) != 2:
+        raise MenuParserException(
+            'The date range string found above a menu does not contain exactly '
+            'two dates as determined by our Regex. \n'
+            'Date string: {0}\nRegex: {1}'.format(date_range_string,
+                                                  date_regex))
 
     dates = [datetime.datetime.strptime(string, "%d.%m.%y").date()
              for string in date_strings]
     start_date, end_date = dates[0], dates[1]
 
-    assert start_date < end_date, (
-        'The start date posted above a menu came before the end date: ' +
-        date_range_string)
+    if not start_date < end_date:
+        raise MenuParserException(
+            'The start date posted above a menu came before the end date: ' +
+            date_range_string)
 
     range_length = (end_date - start_date).days + 1
 
-    assert range_length == 5, (
-        "We assume that each menu covers five days, but this menu has the "
-        "following dates posted above it: \n{0}\n "
-        "Maybe our assumption is no longer true.".format(date_range_string))
+    if range_length != 5:
+        raise MenuParserException(
+            "We assume that each menu covers five days, but this menu has the "
+            "following dates posted above it: \n{0}\n "
+            "Maybe our assumption is no longer true.".format(date_range_string))
 
     date_range = [(start_date + datetime.timedelta(days=n))
                   for n in range(range_length)]
@@ -98,12 +115,13 @@ def get_date_range_from_string(date_range_string):
 
 def get_menu_entries_for_five_days(category_row):
     cells = category_row.find_all('td', recursive=False)
-    assert len(cells) == 6, (
-        "A row in the Speisekarte should be six columns wide: One category "
-        "name plus five days' worth of menu entries. This row is either too "
-        "wide or not wide enough: \n" +
-        "\n".join("Column {i}: {text}".format(i=i, text=td.text)
-                  for i, td in enumerate(cells)))
+    if len(cells) != 6:
+        raise MenuParserException(
+            "A row in the Speisekarte should be six columns wide: One category "
+            "name plus five days' worth of menu entries. This row is either "
+            "too wide or not wide enough: \n" +
+            "\n".join("Column {i}: {text}".format(i=i, text=td.text)
+                      for i, td in enumerate(cells)))
 
     return cells[1:]
 
@@ -135,7 +153,10 @@ def item_from_string(item_string):
     # Split the item_string into its components, e.g.
     # ['Spaghetti', '(Gl)', ''] or ['Eisbergsalat 0,35']
     item_split = re.split("(\(.+?\))", item_string.strip())
-    assert len(item_split) == 1 or len(item_split) == 3
+    if not (len(item_split) == 1 or len(item_split) == 3):
+        raise MenuParserException("An item string could not be split into "
+                                  "name/price and allergens: {0}"
+                                  .format(item_split))
 
     allergens = item_split[1] if len(item_split) == 3 else None
 
@@ -178,3 +199,7 @@ def strip_price_from_string(string):
 def get_price_from_string(string):
     match = re.search("([0-9],[0-9][0-9])", string)
     return int(match.group(0).replace(',', '')) if match else None
+
+
+class MenuParserException(Exception):
+    pass
