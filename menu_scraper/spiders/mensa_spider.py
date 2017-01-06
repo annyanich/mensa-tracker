@@ -1,7 +1,7 @@
 import scrapy
 from config import menu_urls_and_names
 
-from menu_scraper.soup_parser import get_all_menu_items
+from menu_scraper.menu_parser import get_all_menu_items
 
 
 class MensaSpider(scrapy.Spider):
