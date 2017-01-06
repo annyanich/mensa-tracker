@@ -6,6 +6,7 @@ import datetime
 import menu_scraper.items
 from config import menu_urls_and_names
 from bs4 import BeautifulSoup
+import logging
 
 
 def get_all_menu_items(response):
@@ -19,15 +20,11 @@ def get_all_menu_items(response):
     for table in get_menu_tables(soup):
         try: 
             for entry in parse_table(table):
-                try:
-                    entry['mensa'] = menu_urls_and_names[response.url]
-                    yield entry
-                except MenuParserException as e:
-                    print("Ran into a problem parsing a menu item. "
-                          "Got a MenuParserException: {0}".format(e))
-        except MenuParserException as e:
-            print("Ran into a problem parsing the menus on a page. "
-                  "Got a MenuParserException: {0}".format(e))
+                entry['mensa'] = menu_urls_and_names[response.url]
+                yield entry
+        except MenuParsingException as e:
+            logging.error("Ran into a problem parsing the menus on a page. "
+                  "Got a MenuParsingException: {0}".format(e))
 
 
 def get_menu_tables(soup):
@@ -41,7 +38,7 @@ def get_menu_tables(soup):
 
     tables = soup.findAll(is_menu_table)
     if len(tables) < 1 or len(tables) > 2:
-        raise MenuParserException("An unexpected number of menu tables was "
+        raise MenuParsingException("An unexpected number of menu tables was "
                                   "found on the Mensa website: {0} tables. "
                                   "We normally expect to see two."
                                   .format(len(tables)))
@@ -67,12 +64,17 @@ def parse_table(menu_table):
             menu_item_elements = td.find_all(attrs={'class': 'speise_eintrag'})
 
             for element in menu_item_elements:
-                item = item_from_string(element.text)
-                item['category'] = get_category_name_from_row(category_row)
-                item['date_valid'] = date
-                if not item['price']:
-                    item['price'] = get_price_from_row(category_row)
-                yield item
+                try:
+                    item = item_from_string(element.text)
+                    item['category'] = get_category_name_from_row(category_row)
+                    item['date_valid'] = date
+                    if not item['price']:
+                        item['price'] = get_price_from_row(category_row)
+                    yield item
+
+                except ItemParsingException as e:
+                    logging.error("Ran into a problem parsing a menu item. "
+                          "Got a ItemParsingException: {0}".format(e))
 
 
 def get_date_range_from_string(date_range_string):
@@ -85,7 +87,7 @@ def get_date_range_from_string(date_range_string):
     date_regex = '[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]'
     date_strings = re.findall(date_regex, date_range_string)
     if len(date_strings) != 2:
-        raise MenuParserException(
+        raise MenuParsingException(
             'The date range string found above a menu does not contain exactly '
             'two dates as determined by our Regex. \n'
             'Date string: {0}\nRegex: {1}'.format(date_range_string,
@@ -96,14 +98,14 @@ def get_date_range_from_string(date_range_string):
     start_date, end_date = dates[0], dates[1]
 
     if not start_date < end_date:
-        raise MenuParserException(
+        raise MenuParsingException(
             'The start date posted above a menu came before the end date: ' +
             date_range_string)
 
     range_length = (end_date - start_date).days + 1
 
     if range_length != 5:
-        raise MenuParserException(
+        raise MenuParsingException(
             "We assume that each menu covers five days, but this menu has the "
             "following dates posted above it: \n{0}\n "
             "Maybe our assumption is no longer true.".format(date_range_string))
@@ -116,7 +118,7 @@ def get_date_range_from_string(date_range_string):
 def get_menu_entries_for_five_days(category_row):
     cells = category_row.find_all('td', recursive=False)
     if len(cells) != 6:
-        raise MenuParserException(
+        raise MenuParsingException(
             "A row in the Speisekarte should be six columns wide: One category "
             "name plus five days' worth of menu entries. This row is either "
             "too wide or not wide enough: \n" +
@@ -153,12 +155,12 @@ def item_from_string(item_string):
     # Split the item_string into its components, e.g.
     # ['Spaghetti', '(Gl)', ''] or ['Eisbergsalat 0,35']
     item_split = re.split("(\(.+?\))", item_string.strip())
-    if not (len(item_split) == 1 or len(item_split) == 3):
-        raise MenuParserException("An item string could not be split into "
+    if len(item_split) not in [1, 3, 5]:
+        raise ItemParsingException("An item string could not be split into "
                                   "name/price and allergens: {0}"
                                   .format(item_split))
 
-    allergens = item_split[1] if len(item_split) == 3 else None
+    allergens = ",".join(re.findall("(\(.+?\))", item_string.strip()))
 
     price = get_price_from_string(item_string)
 
@@ -201,5 +203,15 @@ def get_price_from_string(string):
     return int(match.group(0).replace(',', '')) if match else None
 
 
-class MenuParserException(Exception):
+class MenuParsingException(Exception):
+    """Signifies a problem with parsing a whole menu.
+    This is serious and should be fixed quickly, since it means we may be
+    missing an entire week's worth of menu entries."""
+    pass
+
+
+class ItemParsingException(Exception):
+    """Raised when an individual item on a menu could not be parsed.  It's okay
+     if we get one or two of these a week, although I would like to strive for
+     100% success."""
     pass
