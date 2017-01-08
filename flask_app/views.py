@@ -139,7 +139,9 @@ def test_search():
                if menu_entry.does_search_match(request.form['search_terms'])
                if menu_entry.mensa in ['Uhlhornsweg Culinarium',
                                        'Uhlhornsweg Pasta & Veggie/Vegan',
-                                       'Uhlhornsweg Classic']]
+                                       'Uhlhornsweg Classic',
+                                       'Wechloy',
+                                       'Ofener Straße']]
     matches.sort(key=lambda entry: entry.date_valid, reverse=True)
 
     result_dict = {'result %s' % entry.id:
