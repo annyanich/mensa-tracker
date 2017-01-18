@@ -1,132 +1,155 @@
 {% extends "layout.html" %}
+{% block heading %}
+  {% if current_user.is_authenticated %}
+    Hallo, {{ current_user.nickname }}!
+  {% else %}
+    Ann's Mensa Tracker
+  {% endif %}
+{% endblock %}
+
 {% block content %}
-    <h1>Welcome to Ann's Mensa Tracker</h1>
-    <p>Never miss your favorite foods in the Mensa again!
-      Enter their names here, and I will send you an email the night before
-      when they're going to be on the menu.
 
-    {% if current_user.is_authenticated %}
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="text-center saved-searches-header" id="saved_searches_table_header">
-              You will get alerts for dishes that match the following search terms:
-          </div>
+  {% if current_user.is_anonymous %}
+    <div class="row row-paragraph">
+      <div class="col-sm-12 col-lg-8 col-lg-offset-2">
+        Do you eat in the Mensa at the Universität Oldenburg?  Do you wish you
+        could be reminded when certain dishes appear on the menu?  </div></div>
+
+    <div class="row row-gutter">
+      <div class="col-sm-12 col-lg-8 col-lg-offset-2">
+        Once a night, Ann's Mensa Tracker checks the menus for the Mensas in
+        Uhlhornsweg, Wechloy, and Ofener Straße.
+        It will send you an email when dishes appear that match your search terms.
+        This way, you can spend more time eating with your friends, and less
+        time standing in front of that big projector.
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12 col-lg-8 col-lg-offset-2">
+      </div>
+    </div>
+  {% endif %}
+
+  {% if current_user.is_authenticated %}
+    <div class="row">
+      <div class="col-sm-12 col-lg-8 col-lg-offset-2">
+        <div class="text-center saved-searches-header" id="saved_searches_table_header">
+          You will get alerts for dishes that match the following search terms:
         </div>
       </div>
-      <div class="row">
-        <div class="col-sm-12">
+    </div>
+    <div class="row">
+      <div class="col-sm-12 col-lg-8 col-lg-offset-2">
 
-          <table class="table table-vcenter saved-searches"
-                 id="saved_searches_table"
-                 style="width:100%">
-            <thead><tr>
-              <th class="hidden">Search ID</th>
-              <th>Search terms</th>
-              <th></th>
-            </tr></thead>
+        <table class="table table-vcenter saved-searches"
+               id="saved_searches_table"
+               style="width:100%">
+          <thead><tr>
+            <th class="hidden">Search ID</th>
+            <th>Search terms</th>
+            <th>Actions</th>
+          </tr></thead>
 
-            <tbody>
-              {% for search in current_user.searches.all() %}
-                <tr>
-                  <td>saved_search_{{ search.id }}</td>
-                  <td width="100%">"{{ search.search_terms }}"</td>
-                  <td><div class="btn-group">
-                      <a href="javascript:setSearchTerms('{{ search.search_terms }}'); runSearch();"
-                          class="btn btn-md btn-default">Test search</a>
-                      <a href="javascript:deleteSearch({{ search.id }})"
-                         class="btn btn-md btn-danger">Delete</a>
-                    </div>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+          <tbody>
+          {% for search in current_user.searches.all() %}
+            <tr>
+              <td>saved_search_{{ search.id }}</td>
+              <td width="100%">"{{ search.search_terms }}"</td>
+              <td><div class="btn-group">
+                <a href="javascript:setSearchTerms('{{ search.search_terms }}'); runSearch();"
+                   class="btn btn-md btn-default">Test search</a>
+                <a href="javascript:deleteSearch({{ search.id }})"
+                   class="btn btn-md btn-danger">Delete</a>
+              </div>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
 
-        </div>
       </div>
-    {% endif %}
+    </div>
+  {% endif %}
 
-    <br/>
-    <div class="row" id="search-box">
-      <div class="col-sm-12">
-        <form name="testsearch" action="javascript:runSearch()">
-          <label class="control-label" for="search_terms">
-            Try searching for a dish or an ingredient.</label>
-          <input type="text" name="search_terms" id="search_terms"
-                 placeholder="e.g. Bolognese, Spinat, Vanillesauce"
-                 autocomplete="off" class="form-control"/>
-        </form>
+  <div class="row row-gutter" id="search-box">
+    <div class="col-sm-12 col-lg-8 col-lg-offset-2">
+      <form name="testsearch" action="javascript:runSearch()">
+        <label class="control-label" for="search_terms">
+          Try searching for a dish or an ingredient.</label>
+        <input type="text" name="search_terms" id="search_terms"
+               placeholder="e.g. Bolognese, Spinat, Vanillesauce"
+               autocomplete="off" class="form-control"/>
+      </form>
+    </div>
+  </div>
+
+  <span id="search_results_placeholder"></span>
+  <div id="search_results_container" class="hide-by-default">
+    <div class="row">
+      <div class="col-sm-12 col-lg-8 col-lg-offset-2">
+        <div class="text-center"><h4><span id="search_results_header">Search results</span></h4></div>
+        <table id="search_results_table" class="table table-striped">
+          <thead><tr>
+            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Date</th>
+            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Mensa</th>
+            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Category</th>
+            <th class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Item description</th>
+          </tr></thead>
+          <tbody>
+          </tbody>
+        </table>
       </div>
     </div>
     <br/>
 
-    <span id="search_results_placeholder"></span>
-    <div id="search_results_container" class="hide-by-default">
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="text-center"><h4><span id="search_results_header">Search results</span></h4></div>
-          <table id="search_results_table" class="table table-striped">
-            <thead><tr>
-              <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Date</th>
-              <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Mensa</th>
-              <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Category</th>
-              <th class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Item description</th>
-            </tr></thead>
-            <tbody>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <br/>
-
-      <div class="row">
-        <div class="col-sm-12">
-          {% if current_user.is_authenticated %}
+    <div class="row">
+      <div class="col-sm-12 col-lg-8 col-lg-offset-2">
+        {% if current_user.is_authenticated %}
           <a href="javascript:saveSearchFromForm()" class="btn btn-primary btn-lg btn-block">
             Subscribe to alerts for this search</a>
-          {% else %}
+        {% else %}
           <a href="javascript:redirectToFacebook()"
-             class="btn btn-primary btn-lg btn-block">
-            Log in with Facebook to subscribe to alerts for this search</a>
-          {% endif %}
-        </div>
+             class="btn btn-primary btn-md btn-block">
+            Log in with Facebook to receive alerts for this search</a>
+        {% endif %}
       </div>
+    </div>
 
-    </div>  <!--End search results-->
+  </div>  <!--End search results-->
 
-    <br/>
+  <br/>
 
-    {% if current_user.is_authenticated %}
-      <div class="row"><div class="col-sm-12">
-        You're logged in as {{ current_user.nickname }}.
-        <p>
-          {% if current_user.email == None %}
-            If you would like to receive email alerts,
-            <a href="{{ url_for('oauth_rerequest_permissions') }}">grant us permission here.</a>
-          {% else %}
-            You will get email alerts at {{ current_user.email }}.
-            <a href="{{ url_for('delete_email_address') }}">Click here to remove your email address.</a>
-          {% endif %}
-        </p>
-        <p><a href="{{ url_for('logout') }}">Log out</a></p>
-      </div></div>
-    {% endif %}
+  {% if current_user.is_authenticated %}
+    <div class="row"><div class="col-sm-12 col-lg-8 col-lg-offset-2">
+      You're logged in as {{ current_user.nickname }}.
+      <p>
+        {% if current_user.email == None %}
+          If you would like to receive email alerts,
+          <a href="{{ url_for('oauth_rerequest_permissions') }}">grant us permission here.</a>
+        {% else %}
+          You will get email alerts at {{ current_user.email }}.
+          <a href="{{ url_for('delete_email_address') }}">Click here to remove your email address.</a>
+        {% endif %}
+      </p>
+      <p><a href="{{ url_for('logout') }}">Log out</a></p>
+    </div></div>
+  {% endif %}
 
 {% endblock %}  <!--End main body container-->
 
 
 {% block scripts %}
 
-    <script src="../static/datatables/datatables.min.js"></script>
-    <script src="../static/js/datetime-moment.js"></script>
+  <script src="../static/datatables/datatables.min.js"></script>
+  <script src="../static/js/datetime-moment.js"></script>
 
-    <!--Custom code using jQuery to run searches and save/delete subscriptions-->
-    <script>
-       var table;
+  <!--Custom code using jQuery to run searches and save/delete subscriptions-->
+  <script>
+      var table;
 
-       var saved_searches_datatable;
+      var saved_searches_datatable;
 
-       $(document).ready(function() {
+      $(document).ready(function() {
           window.history.replaceState({}, "", "/");  // Clean up URL in address bar
 
           // Initialize DataTables to display subscriptions and search results
@@ -136,8 +159,8 @@
           table = $('#search_results_table').DataTable( {
               "order": [[0, "desc"]],
               "columnDefs": [
-                { "orderable": false, "targets": 3 } // No sorting by description
-                ],
+                  { "orderable": false, "targets": 3 } // No sorting by description
+              ],
               "searching": false,
               "pageLength": 5,
               "lengthChange": false,
@@ -181,17 +204,17 @@
           // automatically save that search.  This is useful for our login flow,
           // in which we have Facebook redirect a user back to this URL
           // after logging in.
-           {% if search_terms_url_param %}
-               saveSearch("{{ search_terms_url_param }}");
-           {% endif %}
+          {% if search_terms_url_param %}
+              saveSearch("{{ search_terms_url_param }}");
+          {% endif %}
 
           if (saved_searches_datatable.rows().count() == 0) {
               hideSavedSearches();
           }
 
-       } );  // End $('document').ready()
+      } );  // End $('document').ready()
 
-       function deleteSearch(search_id) {
+      function deleteSearch(search_id) {
           jQuery.post('/savedsearches/' + search_id + '/delete', {
               'search_id': search_id
           }).done(function(results) {
@@ -212,18 +235,18 @@
           }).fail(function(error) {
               alert("Error communicating with the server.  Try refreshing the page.");
           })
-       }
+      }
 
-       function saveSearch(search_terms) {
-           if (search_terms == "") {
-               alert("Please enter some search terms.");
-               return;
-           }
+      function saveSearch(search_terms) {
+          if (search_terms == "") {
+              alert("Please enter some search terms.");
+              return;
+          }
 
-           jQuery.post('/add_search', {
-               search_terms: search_terms
-           }).done(function(results) {
-               if (results['status'] == 'success') {
+          jQuery.post('/add_search', {
+              search_terms: search_terms
+          }).done(function(results) {
+              if (results['status'] == 'success') {
                   saved_searches_datatable.row.add([
                       "saved_search_" + results['search_id'],
                       '"' + search_terms + '"',
@@ -232,19 +255,19 @@
                   showSavedSearches();
                   scroll_to_div($('#saved_searches_table_header'))
 
-               } else if (results['status'] == 'failed') {
-                   alert(results['reason']);
-               } else {
-                   alert("Received unknown status from server: " + status);
-               }
-           }).fail(function(error) {
-               alert("Error communicating with the server.  Try refreshing the page.");
-           })
-       }
+              } else if (results['status'] == 'failed') {
+                  alert(results['reason']);
+              } else {
+                  alert("Received unknown status from server: " + status);
+              }
+          }).fail(function(error) {
+              alert("Error communicating with the server.  Try refreshing the page.");
+          })
+      }
 
-       function saveSearchFromForm() {
-           saveSearch(getSearchTerms().trim());
-       }
+      function saveSearchFromForm() {
+          saveSearch(getSearchTerms().trim());
+      }
 
 
       function runSearch() {
@@ -277,53 +300,53 @@
       }
 
       function redirectToFacebook() {
-           window.location.href = "{{ url_for('oauth_authorize', provider='facebook') }}&search_terms_to_save=" + getSearchTerms();
+          window.location.href = "{{ url_for('oauth_authorize', provider='facebook') }}&search_terms_to_save=" + getSearchTerms();
       }
 
-       function hideSavedSearches() {
-           $('#saved_searches_table_header').text("(Your saved searches will be listed here.)");
-           $('#saved_searches_table').hide();
-       }
+      function hideSavedSearches() {
+          $('#saved_searches_table_header').text("(Your saved searches will be listed here.)");
+          $('#saved_searches_table').hide();
+      }
 
-       function showSavedSearches() {
-           $('#saved_searches_table_header').text("You will get alerts for dishes that match the following search terms:");
-           $('#saved_searches_table').show()
-       }
+      function showSavedSearches() {
+          $('#saved_searches_table_header').text("You will get alerts for dishes that match the following search terms:");
+          $('#saved_searches_table').show()
+      }
 
-       function hideSearchResults() {
-           $('#search_results_container').hide();
-       }
+      function hideSearchResults() {
+          $('#search_results_container').hide();
+      }
 
-       function showSearchResults() {
-           $('#search_results_header').text("Search results for \"" + getSearchTerms() + "\"");
-           $('#search_results_container').show();
-       }
+      function showSearchResults() {
+          $('#search_results_header').text("Search results for \"" + getSearchTerms() + "\"");
+          $('#search_results_container').show();
+      }
 
-       function scroll_to_div(div) {
+      function scroll_to_div(div) {
           $('html, body').animate({
-            scrollTop: div.offset().top
+              scrollTop: div.offset().top
           },1000);
-        }
+      }
 
 
-       function getSearchTerms() {
-           return document.testsearch.search_terms.value;
-       }
+      function getSearchTerms() {
+          return document.testsearch.search_terms.value;
+      }
 
-       function setSearchTerms(terms) {
-           document.testsearch.search_terms.value = terms;
-       }
+      function setSearchTerms(terms) {
+          document.testsearch.search_terms.value = terms;
+      }
 
 
-       function buttons_for_search(search_terms, search_id) {
-           var html = '<div class="btn-group">';
-           html += "<a href=\"javascript:setSearchTerms('" + search_terms + "'); runSearch();\"";
-           html += "class=\"btn btn-md btn-default\" value=\"Test search\">Test search</a>";
-           html += "<a href=\"javascript:deleteSearch(" + search_id + ")\"";
-           html += "class=\"btn btn-md btn-danger\" value=\"Delete\">Delete</a>";
-           html += "</div>";
-           return html;
-       }
+      function buttons_for_search(search_terms, search_id) {
+          var html = '<div class="btn-group">';
+          html += "<a href=\"javascript:setSearchTerms('" + search_terms + "'); runSearch();\"";
+          html += "class=\"btn btn-md btn-default\" value=\"Test search\">Test search</a>";
+          html += "<a href=\"javascript:deleteSearch(" + search_id + ")\"";
+          html += "class=\"btn btn-md btn-danger\" value=\"Delete\">Delete</a>";
+          html += "</div>";
+          return html;
+      }
 
       function makeDelay(ms) {
           var timer = 0;
@@ -341,6 +364,6 @@
           debounce(runSearch);
       });
 
-    </script>
+  </script>
 
 {% endblock %}

@@ -22,14 +22,17 @@
     <!--Moment.js library for formatting dates and times nicely-->
     <script src="../static/js/moment.min.js"></script>
 
+    <!--Fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=EB+Garamond" rel="stylesheet">
 
 
   </head>
 
   <body>
     <!-- BEGIN site/header -->
-    <div class="navbar navbar-default">
-      <div class="container">
+    <div class="navbar navbar-default navbar-mensatracker">
+      <div class="container-fluid">
         <div class="navbar-header pull-left">
           <div class="navbar-brand">Ann's Mensa Tracker</div>
         </div>
@@ -76,18 +79,24 @@
         {% endfor %}
       </div>
 
+      <div id="heading" class="heading">
+        {% block heading %} {% endblock %}
+      </div>
+
       <div id="content">{% block content %} {% endblock %}</div>
 
     </div>  <!--End main body container-->
 
     <footer class="container">
       <hr>
-      <p>Ann's Mensa Tracker is a new service with lots of room for improvement.
-        Please send your thoughts, ideas, and bug reports to
-        <a href="mailto:mensa.tracker@gmail.com">mensa.tracker@gmail.com</a>.
-        (So far, I only track these three Mensas in Oldenburg:
-         Uhlhornsweg, Wechloy, and Ofener Straße.
-        If you'd like me to start tracking another Mensa, let me know!  :)</p>
+      <div class="row row-gutter">
+        <div class="col-sm-12 col-lg-8 col-lg-offset-2">
+          Ann's Mensa Tracker is not affiliated with the Universität Oldenburg.<br/>
+          If you use my Mensa Tracker, I would love to hear your
+          thoughts about it!  Feel free to drop me a line at
+          <a href="mailto:mensa.tracker@gmail.com">mensa.tracker@gmail.com</a>.
+        </div>
+      </div>
      </footer>
 
 

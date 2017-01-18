@@ -10,3 +10,39 @@ table.saved-searches tbody td {
 .hide-by-default {
     display: none;
 }
+
+.row-gutter {
+    /*margin-top: 20px;*/
+    margin-bottom: 20px;
+}
+.row-paragraph {
+    margin-bottom: 10px;
+}
+.navbar-mensatracker {
+    background-color: #f8f8f8;
+    border-color:#e7e7e7;
+    /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+    /*font-family: 'Georgia', serif;*/
+    /*font-family: 'Quicksand', sans-serif;*/
+    font-family: 'Rubik', sans-serif;
+}
+
+.heading {
+    /*font-family: "Helvetica Neue", Helvetica, Ariel, sans-serif;*/
+    font-family: 'Georgia', serif;
+    font-size: 28pt;
+    margin-bottom: 10px;
+    text-align: center;
+
+}
+body {
+    /*background: #ffc400;*/
+    /*background: #eeeeee;*/
+
+    /*font-family: 'Georgia', serif;*/
+    /*font-family: "Helvetica Neue", Helvetica, Ariel, sans-serif;*/
+    /*font-family: 'Quicksand', sans-serif;*/
+    font-family: 'Rubik', sans-serif;
+    /*color: #222222;*/
+    font-size: 12pt;
+}
