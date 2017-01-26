@@ -10,18 +10,21 @@ Downloads menu data and saves it into a database.
 terms and subscribe to email alerts for them.
 - `email_alerter` Sends emails to users when their searches have matches.
 
+Run configurations are defined in Procfile.  
 Database models are defined in `flask_app/models.py`.  
 Database migrations are handled using Flask-Migrate.  See `/migrations`.
 
-Run configurations are defined in Procfile.
 
-### Installation, developing
-Read INSTALL.md.
+### Installation, running, developing
+See INSTALL.md.
 
-### Authors
+### Authors, credits
 Ann Yanich  
 
-Written with the help of Miguel Grinberg's Flask tutorial.
+I'd like to thank Miguel Grinberg for writing The Flask 
+Mega-Tutorial.  I based my Flask project on his examples. You can find part 1 of 
+his tutorial at  
+https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world .
 
 ### Contact
 Send bugs, feature requests, patches, etc. to ann.yanich@gmail.com.  
