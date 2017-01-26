@@ -1,3 +1,8 @@
+"""
+The code in this file is adapted from a tutorial by Miguel Grinberg.
+https://blog.miguelgrinberg.com/post/oauth-authentication-with-flask
+"""
+
 from rauth import OAuth1Service, OAuth2Service
 from flask import current_app, url_for, request, redirect, session
 import requests
