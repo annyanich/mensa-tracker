@@ -148,7 +148,8 @@ def test_search():
                     {'date_valid': entry.date_valid.strftime("%d.%m.%Y"),
                      'mensa': entry.mensa,
                      'description': entry.description,
-                     'category': entry.category} for entry in matches[:25]}
+                     'category': entry.category,
+                     'price': entry.price} for entry in matches[:25]}
 
     return jsonify(result_dict)
 

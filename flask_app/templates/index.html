@@ -46,7 +46,7 @@
                style="width:100%">
           <thead><tr>
             <th class="hidden">Search ID</th>
-            <th>Search terms</th>
+            <th>Saved Search</th>
             <th>Actions</th>
           </tr></thead>
 
@@ -88,12 +88,12 @@
     <div class="row">
       <div class="col-sm-12 col-lg-8 col-lg-offset-2">
         <div class="text-center"><h4><span id="search_results_header">Search results</span></h4></div>
-        <table id="search_results_table" class="table table-striped">
+        <table id="search_results_table" class="table table-striped table-responsive">
           <thead><tr>
-            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Date</th>
-            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Mensa</th>
-            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Category</th>
-            <th class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Item description</th>
+            <th class="col-lg-1 col-md-2 col-sm-2 col-xs-3">Date</th>
+            <th class="col-lg-3 col-md-5 col-sm-5 col-xs-5">Mensa</th>
+            <th class="col-lg-3 col-md-4 col-sm-4 col-xs-4">Item</th>
+            <th class="col-lg-1 col-md-1 col-sm-1 hidden-xs">Price</th>
           </tr></thead>
           <tbody>
           </tbody>
@@ -110,7 +110,7 @@
         {% else %}
           <a href="javascript:redirectToFacebook()"
              class="btn btn-primary btn-md btn-block">
-            Log in with Facebook to receive alerts for this search</a>
+            Log in with Facebook to receive email alerts</a>
         {% endif %}
       </div>
     </div>
@@ -121,14 +121,13 @@
 
   {% if current_user.is_authenticated %}
     <div class="row"><div class="col-sm-12 col-lg-8 col-lg-offset-2">
-      You're logged in as {{ current_user.nickname }}.
       <p>
         {% if current_user.email == None %}
           If you would like to receive email alerts,
           <a href="{{ url_for('oauth_rerequest_permissions') }}">grant us permission here.</a>
         {% else %}
-          You will get email alerts at {{ current_user.email }}.
-          <a href="{{ url_for('delete_email_address') }}">Click here to remove your email address.</a>
+          You will get email alerts at {{ current_user.email }}.  <br/>
+          <a href="{{ url_for('delete_email_address') }}">Click here to unsubscribe.</a>
         {% endif %}
       </p>
       <p><a href="{{ url_for('logout') }}">Log out</a></p>
@@ -137,15 +136,17 @@
 
 {% endblock %}  <!--End main body container-->
 
-
 {% block scripts %}
 
   <script src="../static/datatables/datatables.min.js"></script>
   <script src="../static/js/datetime-moment.js"></script>
 
+  <link href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.dataTables.min.css" rel="stylesheet">
+  <script src="https://cdn.datatables.net/responsive/2.1.1/js/dataTables.responsive.min.js"></script>
+
   <!--Custom code using jQuery to run searches and save/delete subscriptions-->
   <script>
-      var table;
+      var searchResultsDataTable;
 
       var saved_searches_datatable;
 
@@ -156,10 +157,14 @@
           // Use datetime-moment.js to sort menu entries by date properly
           $.fn.dataTable.moment('DD.MM.YYYY');
 
-          table = $('#search_results_table').DataTable( {
+          searchResultsDataTable = $('#search_results_table').DataTable( {
               "order": [[0, "desc"]],
               "columnDefs": [
-                  { "orderable": false, "targets": 3 } // No sorting by description
+                  { "orderable": false, "targets": 3 }, // No sorting by description
+                  { className: "col-lg-1 col-md-2 col-sm-2 col-xs-3", "targets": 0},
+                  { className: "col-lg-3 col-md-5 col-sm-5 col-xs-5", "targets": 1},
+                  { className: "col-lg-3 col-md-4 col-sm-4 col-xs-4", "targets": 2},
+                  { className: "col-lg-1 col-md-1 col-sm-1 hidden-xs", "targets": 3}
               ],
               "searching": false,
               "pageLength": 5,
@@ -279,17 +284,17 @@
               search_terms: terms
           }).done(function(results) {
               document.getElementById('search_results_placeholder').textContent = "";
-              table.clear();
-              table.page('first');
+              searchResultsDataTable.clear();
+              searchResultsDataTable.page('first');
               $.each(results, function (key, data) {
-                  table.row.add( [
+                  searchResultsDataTable.row.add( [
                       data['date_valid'],
                       data['mensa'],
-                      data['category'],
-                      data['description']
+                      data['description'],
+                      (data['price'] / 100.0).toLocaleString('de-DE', {minimumFractionDigits: 2}) + '€'
                   ])
               });
-              table.draw(false);
+              searchResultsDataTable.draw(false);
               showSearchResults();
           }).fail(function(error) {
               document.getElementById('search_results_placeholder').textContent =
