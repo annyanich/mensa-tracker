@@ -120,10 +120,23 @@ class FacebookSignIn(OAuthSignIn):
     def callback(self, callback_url):
         if 'code' not in request.args:
             return None, None, None, None
+
+        # 04.2017: Login with Facebook started throwing an internal server error
+        # when get_auth_session is called:
+        # "the JSON object must be str, not 'bytes'"
+        # "Decoder failed to handle access_token with data as returned by provider.
+        # A different decoder may be needed."
+        # It was the same one as on this Github issue: https://github.com/litl/rauth/issues/194
+        # The problem can be worked around by using this decoder function.
+        def oauth_decode(data):
+            new_data = data.decode("utf-8", "strict")
+            return json.loads(new_data)
+
         oauth_session = self.service.get_auth_session(
             data={'code': request.args['code'],
                   'grant_type': 'authorization_code',
-                  'redirect_uri': callback_url}
+                  'redirect_uri': callback_url},
+            decoder=oauth_decode
         )
 
         me = oauth_session.get('me', params={'fields': 'email,name,first_name'}).json()
