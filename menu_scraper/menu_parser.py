@@ -31,6 +31,8 @@ def get_menu_tables(soup):
     """
     The 'summary' attribute should be something like
     "Wochenplan Uweg Ausgabe B (aktuelle Woche)".
+
+    <table summary='Wochenplan Uweg Ausgabe B...'>
     """
     def is_menu_table(tag):
         return tag.name == 'table' and tag.has_attr('summary')\
