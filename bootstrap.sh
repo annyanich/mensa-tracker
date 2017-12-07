@@ -10,6 +10,7 @@ echo "deb http://toolbelt.heroku.com/ubuntu ./" > /etc/apt/sources.list.d/heroku
 apt-key add /vagrant/heroku_release.key
 
 apt-get update
+apt-get upgrade
 
 apt-get install -y python3-pip python3-dev libffi-dev libssl-dev libxml2-dev libxslt1-dev python3-lxml
 apt-get install -y git ipython3 # For convenience during development
@@ -18,6 +19,7 @@ apt-get install -y postgresql
 apt-get install -y rabbitmq-server
 apt-get install -y heroku-toolbelt
 
+/usr/bin/pip3 install pip --upgrade
 /usr/bin/pip3 install -r /vagrant/requirements.txt
 
 sudo -u postgres createuser --superuser vagrant
