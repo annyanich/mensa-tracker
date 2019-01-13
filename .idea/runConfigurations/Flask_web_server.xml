@@ -19,7 +19,7 @@
     <module name="mensa-tracker" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/flask_manage.py" />
-    <option name="PARAMETERS" value="runserver -h 192.168.56.2 -p 5000" />
+    <option name="PARAMETERS" value="runserverdev -h 192.168.56.2 -p 5000" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <method />
   </configuration>
