@@ -32,6 +32,11 @@ sudo -u postgres psql -c "ALTER USER vagrant WITH PASSWORD 'password';"
 # Password: guest
 # This lets you peek at the emails in the queue.
 rabbitmq-plugins enable rabbitmq_management
+# Create admin user for access to web ui (Guest doesn't work for some reason)
+rabbitmqctl add_user admin admin
+rabbitmqctl set_permissions admin '.*' '.*' '.*'
+rabbitmqctl set_user_tags admin administrator
+
 /etc/init.d/rabbitmq-server restart
 
 # Upgrade the app's db to the latest version

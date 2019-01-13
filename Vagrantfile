@@ -9,6 +9,8 @@ Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/xenial64"
   config.vm.provision :shell, path: "bootstrap.sh"
   config.vm.network "private_network", ip: "192.168.58.2"
+  # This is the port where rabbitMQ's management web UI listens at
+  config.vm.network "forwarded_port", guest:15672, host:15672
 end
 
 # Below are some common configuration options that may come in handy.
