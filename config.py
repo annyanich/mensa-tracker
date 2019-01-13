@@ -69,12 +69,12 @@ if os.environ.get('FACEBOOK_APP_SECRET') is None:
 else:
     OAUTH_CREDENTIALS['facebook']['secret'] = os.environ['FACEBOOK_APP_SECRET']
 
-if os.environ.get('RABBITMQ_BIGWIG_URL') is None:
-    print("The environment variable 'RABBITMQ_BIGWIG_URL' is missing.  "
+if os.environ.get('CLOUDAMQP_URL') is None:
+    print("The environment variable 'CLOUDAMQP_URL' is missing.  "
           "Without it, we can't queue up emails in RabbitMQ.  "
           "This is normally provided by the RabbitMQ Bigwig addon in Heroku.")
 else:
-    RABBITMQ_BIGWIG_URL = os.environ['RABBITMQ_BIGWIG_URL']
+    CLOUDAMQP_URL = os.environ['CLOUDAMQP_URL']
 
 if os.environ.get('GMAIL_USERNAME') is None:
     print("The environment variable 'GMAIL_USERNAME' is missing.  "

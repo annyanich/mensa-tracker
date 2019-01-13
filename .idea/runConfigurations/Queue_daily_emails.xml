@@ -5,7 +5,7 @@
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
       <env name="DATABASE_URL" value="postgres://vagrant@localhost:5432/vagrant" />
-      <env name="RABBITMQ_BIGWIG_URL" value="amqp://guest:guest@localhost:5672/" />
+      <env name="CLOUDAMQP_URL" value="amqp://guest:guest@localhost:5672/" />
       <env name="DEBUG" value="True" />
       <env name="PGPASSWORD" value="password" />
     </envs>
