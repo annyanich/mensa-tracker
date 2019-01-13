@@ -12,6 +12,15 @@ import datetime
 import re
 
 
+# Make all HTTP requests redirect to HTTPS
+@app.before_request
+def before_request():
+    if not request.is_secure:
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
+
+
 @lm.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
