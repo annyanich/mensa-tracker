@@ -1,7 +1,7 @@
 alembic==0.8.6
 beautifulsoup4==4.4.1
 celery==4.1.1
-cffi==1.8
+cffi==1.14.2
 characteristic==14.3.0
 cryptography==3.2.1
 cssselect==0.9.1
