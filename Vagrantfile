@@ -6,7 +6,12 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure(2) do |config|
-  config.vm.box = "ubuntu/xenial64"
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+  # config.vm.provider "virtualbox" do |vb|
+  config.vm.box = "ubuntu/focal64"
   config.vm.provision :shell, path: "bootstrap.sh"
   config.vm.network "private_network", ip: "192.168.58.2"
   # This is the port where rabbitMQ's management web UI listens at
@@ -29,11 +34,6 @@ end
   # your network.
   # config.vm.network "public_network"
 
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  # config.vm.provider "virtualbox" do |vb|
   #   # Display the VirtualBox GUI when booting the machine
   #   vb.gui = true
   #
