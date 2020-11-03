@@ -5,8 +5,11 @@
 import os
 import locale
 
-from dotenv import load_dotenv
-load_dotenv(verbose=True)
+# Do not load the development config from .env in deployment.
+# Environment variables are provided as "config vars" in Heroku's web UI.
+if not os.environ.get('IS_HEROKU'):
+    from dotenv import load_dotenv
+    load_dotenv(verbose=True)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
