@@ -1,6 +1,6 @@
 alembic==0.8.6
 beautifulsoup4==4.9.3
-celery==4.1.1
+celery==5.2.2
 cffi==1.14.2
 characteristic==14.3.0
 cryptography==3.2.1
